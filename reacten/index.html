@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reacten Arena — Support</title>
+<meta name="description" content="Reacten Arena: 10 targets, one clock, fastest wins. Help, FAQ and contact for the reaction-speed game by PyroDadDev.">
+<link rel="icon" href="/favicon.png">
+<style>
+  :root { --bg:#0A0E14; --card:#11161F; --line:#232D3D; --text:#F5F7FA; --muted:#8B95A7; --accent:#22D3EE; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:40px 20px 64px; }
+  a { color:var(--accent); }
+  .hero { display:flex; align-items:center; gap:18px; margin-bottom:12px; }
+  .hero img { width:88px; height:88px; border-radius:22px; }
+  h1 { font-size:32px; margin:0; letter-spacing:-.4px; }
+  .tag { color:var(--muted); margin:4px 0 0; }
+  .stores { display:flex; gap:10px; flex-wrap:wrap; margin:22px 0 8px; }
+  .btn { display:inline-block; padding:10px 16px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); text-decoration:none; font-weight:600; }
+  .btn.soon { color:var(--muted); }
+  h2 { font-size:20px; margin:36px 0 10px; color:var(--accent); }
+  details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:10px 0; }
+  summary { cursor:pointer; font-weight:600; }
+  details p { margin:10px 0 2px; color:#D5DAE3; }
+  footer { margin-top:48px; color:var(--muted); font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img src="/reacten-icon-192.png" alt="Reacten Arena icon">
+    <div>
+      <h1>Reacten Arena</h1>
+      <p class="tag">10 targets. One clock. Fastest wins.</p>
+    </div>
+  </div>
+  <p>A pure reaction-speed game. Tap 10 targets as fast as you can: the clock starts on your
+  first hit and stops on your tenth. Play Quick Play, take on the Daily Arena (the same pattern
+  for everyone, every day) or warm up in Practice.</p>
+  <div class="stores">
+    <a class="btn" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.reacten">Google Play</a>
+    <span class="btn soon">App Store: coming soon</span>
+  </div>
+
+  <h2>Support</h2>
+  <p>Found a bug, or have an idea or a question? Email
+  <a href="mailto:pyrodaddev@googlegroups.com?subject=Reacten%20Arena">pyrodaddev@googlegroups.com</a>. Please include
+  your phone model and what happened. We aim to reply within a few days.</p>
+
+  <h2>FAQ</h2>
+  <details>
+    <summary>When does the clock start and stop?</summary>
+    <p>On your first successful hit, and on your last. Taps before the first target don’t cost
+    you anything. The time comes from a precise stopwatch, not screen frames, so a stutter on
+    screen can never change your result.</p>
+  </details>
+  <details>
+    <summary>Why was my run cancelled?</summary>
+    <p>If the game goes into the background mid-run (a phone call, switching apps, locking the
+    screen), the attempt is voided so every time on the board is a real, uninterrupted run. Tap
+    “Run it back” to go again.</p>
+  </details>
+  <details>
+    <summary>Why wasn’t my time ranked?</summary>
+    <p>Runs averaging under 120 ms per target are beyond human speed and are flagged instead of
+    ranked. Practice runs are never ranked either.</p>
+  </details>
+  <details>
+    <summary>When does the Daily Arena change?</summary>
+    <p>At midnight, local time on your device. Everyone who plays on the same date gets the same
+    target pattern.</p>
+  </details>
+  <details>
+    <summary>I bought Remove Ads. How do I get it on a new phone?</summary>
+    <p>Sign in to the same Google or Apple account, then open <em>Settings → Restore purchase</em>.</p>
+  </details>
+  <details>
+    <summary>How do I change my ad privacy choice?</summary>
+    <p>In the UK, EEA and Switzerland, open <em>Settings → Ad privacy choices</em>. See the
+    <a href="/reacten/privacy/">privacy policy</a> for details.</p>
+  </details>
+  <details>
+    <summary>How do I reset my stats?</summary>
+    <p><em>Settings → Reset local stats</em>. This deletes every run, personal best and streak
+    on that device, and can’t be undone.</p>
+  </details>
+
+  <footer>
+    <p><a href="/reacten/privacy/">Privacy policy</a> · <a href="/">PyroDadDev</a> · Made in Wales</p>
+  </footer>
+</main>
+</body>
+</html>
