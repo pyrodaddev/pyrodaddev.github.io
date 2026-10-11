@@ -148,7 +148,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
@@ -256,8 +256,16 @@ async function loadDays() {
 function renderWho(user) {
   const who = $('who');
   if (!user) {
-    who.innerHTML = '<span class="muted">Public view</span><button id="signin">Sign in with Google</button>';
-    $('signin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
+    who.innerHTML = '<span class="muted">Public view</span><button id="signin">Sign in with Google</button>' +
+      '<a href="#" id="signinRedirect" class="muted">no pop-ups?</a>';
+    $('signin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+        signInWithRedirect(auth, new GoogleAuthProvider());
+      } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+        alert(e.message);
+      }
+    });
+    $('signinRedirect').onclick = (ev) => { ev.preventDefault(); signInWithRedirect(auth, new GoogleAuthProvider()); };
     return;
   }
   who.innerHTML = `<span>${esc(user.email || user.uid)}</span><span class="pill ${isAdmin ? 'ok' : 'no'}">${isAdmin ? 'admin' : 'not an admin'}</span>` +
@@ -372,6 +380,7 @@ $('lookup').onclick = async () => {
 
 $('refresh').onclick = () => { loadPops(); loadDays(); };
 $('showEvent').onchange = renderPops;
+getRedirectResult(auth).catch(e => alert(`Sign-in failed: ${e.message}`));
 renderKpis();
 loadPops().catch(e => { $('popTable').innerHTML = `<tr><td class="muted">Couldn't load populations: ${esc(e.message)}</td></tr>`; });
 loadDays().catch(() => {});
