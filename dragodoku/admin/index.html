@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Dragodoku Registry</title>
+<link rel="icon" href="/dragodoku/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("../assets/Fredoka-600.woff2") format("woff2"); }
+  :root { --night:#15102A; --deep:#0E0A1E; --surface:#211A3B; --card:#2A2149; --high:#342A5A; --line:#3E3470;
+          --text:#FFF6EA; --soft:#BDB3DD; --faint:#8C82B0; --ember:#FF8A3D; --gold:#FFC857; --moss:#7BD389; --danger:#FF5D6C;
+          --common:#B9C3D6; --uncommon:#7BD389; --rare:#5FB4FF; --epic:#C07BFF; --legendary:#FFC23D; }
+  * { box-sizing:border-box; }
+  html { background:var(--deep); }
+  body { margin:0; color:var(--soft); background:linear-gradient(180deg,#231A45 0,var(--night) 360px,var(--deep) 100%);
+         font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; min-height:100vh; }
+  main { max-width:1180px; margin:0 auto; padding:24px 16px 64px; }
+  h1, h2 { font-family:"Fredoka",system-ui,sans-serif; color:var(--text); font-weight:600; margin:0; }
+  h1 { font-size:26px; }
+  h2 { font-size:19px; margin-bottom:10px; }
+  a { color:var(--gold); }
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  header .brand { display:flex; gap:12px; align-items:center; }
+  header img { width:44px; height:44px; border-radius:12px; }
+  .who { display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:14px; }
+  .pill { display:inline-block; padding:3px 10px; border-radius:99px; background:var(--high); color:var(--text); font-size:13px; }
+  .pill.ok { background:rgba(123,211,137,.18); color:var(--moss); }
+  .pill.no { background:rgba(255,93,108,.15); color:var(--danger); }
+  button, select, input { font:inherit; }
+  button { background:var(--ember); color:#2B1D3F; border:0; border-radius:99px; padding:8px 16px; font-weight:700; cursor:pointer; }
+  button.ghost { background:transparent; color:var(--text); border:1.5px solid var(--line); }
+  button.danger { background:transparent; color:var(--danger); border:1.5px solid rgba(255,93,108,.5); padding:4px 12px; }
+  button:disabled { opacity:.5; cursor:default; }
+  select, input[type=text], input[type=number] { background:var(--surface); color:var(--text); border:1.5px solid var(--line);
+         border-radius:12px; padding:7px 10px; min-width:0; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; margin:14px 0; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px 16px; }
+  .kpi b { display:block; font-family:"Fredoka",system-ui,sans-serif; font-weight:600; font-size:28px; color:var(--text);
+           font-variant-numeric:tabular-nums; line-height:1.2; }
+  .kpi span { font-size:13px; color:var(--faint); }
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { padding:7px 9px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+  th { color:var(--faint); font-weight:600; position:sticky; top:0; background:var(--card); }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.total td { color:var(--text); font-weight:700; border-bottom:none; }
+  .r-common { color:var(--common); } .r-uncommon { color:var(--uncommon); } .r-rare { color:var(--rare); }
+  .r-epic { color:var(--epic); } .r-legendary { color:var(--legendary); }
+  .muted { color:var(--faint); }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
+  .row label { display:flex; flex-direction:column; gap:4px; font-size:13px; color:var(--faint); }
+  .row label.check { flex-direction:row; align-items:center; gap:6px; color:var(--soft); padding-bottom:8px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:860px) { .grid2 { grid-template-columns:1fr; } }
+  .codes { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+  .code { display:flex; justify-content:space-between; gap:10px; align-items:center; background:var(--surface);
+          border:1px solid var(--line); border-radius:12px; padding:8px 12px; }
+  .code tt { font-size:16px; color:var(--gold); letter-spacing:.5px; }
+  .msg { margin-top:10px; font-size:14px; }
+  .msg.err { color:var(--danger); }
+  .admin-only[hidden] { display:none; }
+  footer { margin-top:32px; color:var(--faint); font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">
+      <img src="../assets/icon-192.png" alt="">
+      <div><h1>Dragodoku Registry</h1><div class="muted">Populations, daily solvers and gift codes</div></div>
+    </div>
+    <div class="who" id="who"><span class="muted">Loading…</span></div>
+  </header>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>Population by species</h2>
+      <div class="row" style="align-items:center">
+        <label class="check"><input type="checkbox" id="showEvent" checked> Event species</label>
+        <button class="ghost" id="refresh">Refresh</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="popTable"></table></div>
+    <p class="muted" style="margin:10px 0 0">Hatched is the highest serial issued. Stage columns count dragons that reached that stage
+    (Fledgling 10 days, Adult 100, Elder 365, Ancient 1,000).</p>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Daily solvers</h2>
+      <div class="table-wrap"><table id="daysTable"></table></div>
+    </section>
+
+    <section class="card admin-only" id="mintCard" hidden>
+      <h2>Mint gift codes</h2>
+      <p class="muted" style="margin:0 0 12px">Each code holds one specific dragon with its own serial number. Players redeem
+      it in <em>Settings → Redeem a gift code</em>. A code works once.</p>
+      <div class="row">
+        <label>Species<select id="mSpecies"></select></label>
+        <label>Stage<select id="mStage">
+          <option value="1">I · Hatchling</option><option value="2">II · Fledgling</option><option value="3">III · Adult</option>
+          <option value="4">IV · Elder</option><option value="5">V · Ancient</option></select></label>
+        <label class="check"><input type="checkbox" id="mGilded"> Gilded</label>
+        <label>How many<input type="number" id="mCount" value="1" min="1" max="25" style="width:80px"></label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label style="flex:1">Note (who it's for)<input type="text" id="mNote" maxlength="80" placeholder="e.g. Halloween giveaway"></label>
+        <button id="mint">Mint</button>
+      </div>
+      <div class="msg" id="mintMsg"></div>
+      <div class="codes" id="minted"></div>
+    </section>
+
+    <section class="card" id="notAdmin" hidden>
+      <h2>Admin access</h2>
+      <p id="notAdminText" style="margin:0"></p>
+    </section>
+  </div>
+
+  <section class="card admin-only" id="codesCard" hidden>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>Recent gift codes</h2>
+      <button class="ghost" id="loadCodes">Load</button>
+    </div>
+    <div class="table-wrap"><table id="codesTable"></table></div>
+  </section>
+
+  <section class="card admin-only" id="lookupCard" hidden>
+    <h2>Find a dragon</h2>
+    <p class="muted" style="margin:0 0 12px">For support and privacy requests: players can send the species and serial number from
+    their card. Deleting registry records never reuses a serial number.</p>
+    <div class="row">
+      <label>Species<select id="lSpecies"></select></label>
+      <label>Serial<input type="number" id="lSerial" min="1" style="width:110px"></label>
+      <button id="lookup">Find</button>
+    </div>
+    <div class="msg" id="lookupMsg"></div>
+    <div class="table-wrap"><table id="lookupTable"></table></div>
+  </section>
+
+  <footer>Data from Cloud Firestore (project dragodoku-b4cec). Populations and daily counts are public; everything else needs
+  an account listed in <code>admins/</code>.</footer>
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const app = initializeApp({
+  apiKey: 'AIzaSyAs9sJ1L-Nzw3V_ewfgdXWiOebA1wIIE_I',
+  authDomain: 'dragodoku-b4cec.firebaseapp.com',
+  projectId: 'dragodoku-b4cec',
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const RARITY = { whelp:'common', drake:'uncommon', wyvern:'rare', serpent:'epic', sovereign:'legendary' };
+const ELEMENTS = ['ember','tide','moss','stone','storm','frost'];
+const NAMES = {
+  whelp:['Cinderpip','Splashpip','Mosspip','Pebblepip','Sparkpip','Frostpip'],
+  drake:['Charhorn','Brinehorn','Bramblehorn','Boulderhorn','Thunderhorn','Rimehorn'],
+  wyvern:['Scorchwing','Wavewing','Leafwing','Cragwing','Galewing','Icewing'],
+  serpent:['Pyrewyrm','Abysswyrm','Thornwyrm','Quartzwyrm','Voltwyrm','Glacierwyrm'],
+  sovereign:['Ignarax','Maelora','Sylvaros','Terragon','Tempestra','Glacivorn'],
+};
+const SPECIES = [];
+let dex = 1;
+for (const lineage of Object.keys(NAMES)) {
+  NAMES[lineage].forEach((name, i) => SPECIES.push({ id:`${lineage}-${ELEMENTS[i]}`, dex:dex++, name, lineage, element:ELEMENTS[i], rarity:RARITY[lineage] }));
+}
+SPECIES.push({ id:'event-gourdgrin', dex:101, name:'Gourdgrin', lineage:'whelp', element:'shadow', rarity:'rare', event:"Hallow's Eve" });
+SPECIES.push({ id:'event-hollowing', dex:102, name:'Hollowing', lineage:'wyvern', element:'shadow', rarity:'epic', event:"Hallow's Eve" });
+const byId = Object.fromEntries(SPECIES.map(s => [s.id, s]));
+
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => (n ?? 0).toLocaleString('en-GB');
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const STAGES = ['Hatchling','Fledgling','Adult','Elder','Ancient'];
+
+// Day index: local calendar days since Monday 12 Oct 2026 (puzzle #1), like the app.
+const EPOCH = Date.UTC(2026, 9, 12);
+const dayIndex = (d) => Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - EPOCH) / 86400000);
+const dayLabel = (i) => new Date(EPOCH + i * 86400000).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', timeZone:'UTC' });
+
+let pops = {};
+let isAdmin = false;
+
+for (const sel of [$('mSpecies'), $('lSpecies')]) {
+  sel.innerHTML = SPECIES.map(s => `<option value="${s.id}">#${String(s.dex).padStart(3,'0')} ${esc(s.name)} · ${cap(s.rarity)}${s.event ? ' (event)' : ''}</option>`).join('');
+}
+
+async function loadPops() {
+  const snap = await getDocs(collection(db, 'pop'));
+  pops = {};
+  snap.forEach(d => { pops[d.id] = d.data(); });
+  renderPops();
+}
+
+function renderPops() {
+  const showEvent = $('showEvent').checked;
+  const rows = SPECIES.filter(s => showEvent || !s.event);
+  const tot = { n:0, g:0, s2:0, s3:0, s4:0, s5:0 };
+  let html = '<tr><th class="n">#</th><th>Species</th><th>Rarity</th><th>Element</th><th class="n">Hatched</th><th class="n">Gilded</th>' +
+    STAGES.slice(1).map(s => `<th class="n">${s}</th>`).join('') + '</tr>';
+  for (const s of rows) {
+    const p = pops[s.id] || {};
+    for (const k of Object.keys(tot)) tot[k] += p[k] || 0;
+    html += `<tr><td class="n muted">${String(s.dex).padStart(3,'0')}</td><td>${esc(s.name)}${s.event ? ' <span class="pill">event</span>' : ''}</td>` +
+      `<td class="r-${s.rarity}">${cap(s.rarity)}</td><td>${cap(s.element)}</td>` +
+      `<td class="n">${fmt(p.n)}</td><td class="n">${fmt(p.g)}</td>` +
+      ['s2','s3','s4','s5'].map(k => `<td class="n">${p[k] ? fmt(p[k]) : '<span class="muted">0</span>'}</td>`).join('') + '</tr>';
+  }
+  html += `<tr class="total"><td></td><td>Total</td><td></td><td></td><td class="n">${fmt(tot.n)}</td><td class="n">${fmt(tot.g)}</td>` +
+    ['s2','s3','s4','s5'].map(k => `<td class="n">${fmt(tot[k])}</td>`).join('') + '</tr>';
+  $('popTable').innerHTML = html;
+  const found = SPECIES.filter(s => !s.event && (pops[s.id]?.n || 0) > 0).length;
+  kpi.hatched = tot.n; kpi.gilded = tot.g; kpi.found = found;
+  renderKpis();
+}
+
+const kpi = { hatched:0, gilded:0, found:0, today:0, todayFlawless:0 };
+function renderKpis() {
+  $('kpis').innerHTML = [
+    [fmt(kpi.today), 'solved today'],
+    [fmt(kpi.todayFlawless), 'flawless today'],
+    [fmt(kpi.hatched), 'dragons hatched'],
+    [fmt(kpi.gilded), 'gilded'],
+    [`${kpi.found}/30`, 'species seen'],
+  ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+}
+
+async function loadDays() {
+  const today = dayIndex(new Date());
+  const days = [];
+  for (let i = today; i > today - 14 && i >= 0; i--) days.push(i);
+  const docs = await Promise.all(days.map(d => getDoc(doc(db, 'days', String(d))).catch(() => null)));
+  let html = '<tr><th>Puzzle</th><th>Date</th><th class="n">Solvers</th><th class="n">Flawless</th></tr>';
+  docs.forEach((snap, i) => {
+    const data = snap && snap.exists() ? snap.data() : {};
+    if (i === 0) { kpi.today = data.n || 0; kpi.todayFlawless = data.g || 0; }
+    html += `<tr><td>#${days[i] + 1}</td><td>${dayLabel(days[i])}${i === 0 ? ' <span class="pill ok">today</span>' : ''}</td>` +
+      `<td class="n">${fmt(data.n)}</td><td class="n">${fmt(data.g)}</td></tr>`;
+  });
+  if (!days.length) html += '<tr><td colspan="4" class="muted">Puzzle #1 is on Monday 12 October 2026.</td></tr>';
+  $('daysTable').innerHTML = html;
+  renderKpis();
+}
+
+function renderWho(user) {
+  const who = $('who');
+  if (!user) {
+    who.innerHTML = '<span class="muted">Public view</span><button id="signin">Sign in with Google</button>';
+    $('signin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
+    return;
+  }
+  who.innerHTML = `<span>${esc(user.email || user.uid)}</span><span class="pill ${isAdmin ? 'ok' : 'no'}">${isAdmin ? 'admin' : 'not an admin'}</span>` +
+    '<button class="ghost" id="signout">Sign out</button>';
+  $('signout').onclick = () => signOut(auth);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  isAdmin = false;
+  if (user && !user.isAnonymous) {
+    try { isAdmin = (await getDoc(doc(db, 'admins', user.uid))).exists(); } catch (e) { isAdmin = false; }
+  }
+  renderWho(user);
+  document.querySelectorAll('.admin-only').forEach(el => { el.hidden = !isAdmin; });
+  $('notAdmin').hidden = !user || isAdmin;
+  if (user && !isAdmin) {
+    $('notAdminText').innerHTML = `You're signed in, but this account isn't an admin yet. To grant access, create a document
+      <code>admins/${esc(user.uid)}</code> in the Firestore console (any fields).`;
+  }
+});
+
+const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+function newCode(sp) {
+  const prefix = (byId[sp].element || 'drago').toUpperCase();
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  const body = Array.from(bytes, b => ALPHABET[b % ALPHABET.length]).join('');
+  return { id: prefix + body, pretty: `${prefix}-${body.slice(0,4)}-${body.slice(4)}` };
+}
+
+$('mint').onclick = async () => {
+  const sp = $('mSpecies').value;
+  const st = Number($('mStage').value);
+  const g = $('mGilded').checked;
+  const count = Math.max(1, Math.min(25, Number($('mCount').value) || 1));
+  const note = $('mNote').value.trim().slice(0, 80);
+  const msg = $('mintMsg');
+  msg.className = 'msg'; msg.textContent = 'Minting…';
+  $('mint').disabled = true;
+  const made = [];
+  try {
+    for (let i = 0; i < count; i++) {
+      const code = newCode(sp);
+      const serial = await runTransaction(db, async (tx) => {
+        const popRef = doc(db, 'pop', sp);
+        const codeRef = doc(db, 'codes', code.id);
+        const [popSnap, codeSnap] = [await tx.get(popRef), await tx.get(codeRef)];
+        if (codeSnap.exists()) throw new Error('code clash, try again');
+        const p = popSnap.exists() ? popSnap.data() : {};
+        const n = (p.n || 0) + 1;
+        const upd = { n, k: `mint:${code.id}` };
+        if (g) upd.g = (p.g || 0) + 1;
+        for (let s = 2; s <= st; s++) upd[`s${s}`] = (p[`s${s}`] || 0) + 1;
+        tx.set(popRef, upd, { merge: true });
+        tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
+        return n;
+      });
+      made.push({ ...code, serial });
+    }
+    msg.textContent = `Minted ${made.length} code${made.length === 1 ? '' : 's'}.`;
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = `Minting failed: ${e.message}`;
+  }
+  $('mint').disabled = false;
+  const s = byId[sp];
+  $('minted').innerHTML = made.map(c => `<div class="code"><div><tt>${c.pretty}</tt><div class="muted">${g ? 'Gilded ' : ''}${esc(s.name)} · ${STAGES[st - 1]} · #${String(c.serial).padStart(4,'0')}</div></div>` +
+    `<button class="ghost" data-copy="${c.pretty}">Copy</button></div>`).join('') + $('minted').innerHTML;
+  document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = 'Copied'; }));
+  loadPops();
+};
+
+$('loadCodes').onclick = async () => {
+  const snap = await getDocs(query(collection(db, 'codes'), orderBy('created', 'desc'), limit(100)));
+  let html = '<tr><th>Code</th><th>Dragon</th><th class="n">Serial</th><th>Note</th><th>Created</th><th>Status</th></tr>';
+  snap.forEach(d => {
+    const c = d.data();
+    const s = byId[c.sp];
+    const pretty = d.id.replace(/^([A-Z]+)([A-Z0-9]{4})([A-Z0-9]{4})$/, '$1-$2-$3');
+    html += `<tr><td><tt>${esc(pretty)}</tt></td><td>${c.g ? 'Gilded ' : ''}${esc(s ? s.name : c.sp)} · ${STAGES[(c.st || 1) - 1]}</td>` +
+      `<td class="n">${c.sn ? '#' + String(c.sn).padStart(4,'0') : '—'}</td><td>${esc(c.note)}</td>` +
+      `<td class="muted">${c.created ? c.created.toDate().toLocaleString('en-GB') : ''}</td>` +
+      `<td>${c.r ? '<span class="pill ok">redeemed</span>' : '<span class="pill">unused</span>'}</td></tr>`;
+  });
+  if (snap.empty) html += '<tr><td colspan="6" class="muted">No codes yet.</td></tr>';
+  $('codesTable').innerHTML = html;
+};
+
+$('lookup').onclick = async () => {
+  const sp = $('lSpecies').value;
+  const sn = Number($('lSerial').value);
+  const msg = $('lookupMsg');
+  msg.className = 'msg'; msg.textContent = 'Searching…';
+  try {
+    const snap = await getDocs(query(collection(db, 'dragons'), where('sp', '==', sp), where('sn', '==', sn)));
+    msg.textContent = snap.empty ? 'No registry record with that species and serial.' : '';
+    let html = '<tr><th>Record</th><th>Stage</th><th>Gilded</th><th>Egg</th><th>Hatched</th><th>Player (anonymous)</th><th></th></tr>';
+    snap.forEach(d => {
+      const r = d.data();
+      html += `<tr><td class="muted">${esc(d.id)}</td><td>${STAGES[(r.st || 1) - 1]}</td><td>${r.g ? 'yes' : 'no'}</td><td>${esc(r.o)}</td>` +
+        `<td>${r.hd != null ? dayLabel(r.hd) : ''}</td><td class="muted">${esc(r.uid)}</td>` +
+        `<td><button class="danger" data-del="${esc(d.id)}">Delete record</button></td></tr>`;
+    });
+    $('lookupTable').innerHTML = snap.empty ? '' : html;
+    document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('Delete this registry record? The serial number stays retired.')) return;
+      await deleteDoc(doc(db, 'dragons', b.dataset.del));
+      b.closest('tr').remove();
+    });
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = `Search failed: ${e.message}`;
+  }
+};
+
+$('refresh').onclick = () => { loadPops(); loadDays(); };
+$('showEvent').onchange = renderPops;
+renderKpis();
+loadPops().catch(e => { $('popTable').innerHTML = `<tr><td class="muted">Couldn't load populations: ${esc(e.message)}</td></tr>`; });
+loadDays().catch(() => {});
+</script>
+</body>
+</html>

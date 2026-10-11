@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy · Dragodoku</title>
+<meta name="description" content="Privacy policy for Dragodoku, a daily logic puzzle game by PyroDadDev.">
+<link rel="icon" href="/dragodoku/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("../assets/Fredoka-600.woff2") format("woff2"); }
+  :root { --night:#15102A; --deep:#0E0A1E; --surface:#211A3B; --card:#2A2149; --line:#3E3470;
+          --text:#FFF6EA; --soft:#BDB3DD; --faint:#8C82B0; --ember:#FF8A3D; --gold:#FFC857; }
+  * { box-sizing:border-box; }
+  html { background:var(--deep); }
+  body { margin:0; color:var(--soft); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,#231A45 0,var(--night) 420px,var(--deep) 100%); min-height:100vh; }
+  main { max-width:780px; margin:0 auto; padding:36px 16px 64px; }
+  a { color:var(--gold); }
+  strong { color:var(--text); }
+  header { display:flex; align-items:center; gap:14px; margin-bottom:26px; }
+  header img { width:60px; height:60px; border-radius:16px; flex:none; }
+  header p { margin:0; color:var(--faint); font-size:14px; }
+  h1, h2 { font-family:"Fredoka",system-ui,sans-serif; color:var(--text); font-weight:600; }
+  h1 { font-size:30px; margin:0; line-height:1.15; }
+  h2 { font-size:20px; margin:36px 0 8px; color:var(--ember); }
+  p { margin:0 0 12px; }
+  ul { padding-left:20px; margin:0 0 12px; }
+  li { margin:4px 0; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px 20px; margin:14px 0; }
+  .table-wrap { overflow-x:auto; margin:12px 0; border:1px solid var(--line); border-radius:14px; }
+  table { width:100%; border-collapse:collapse; font-size:15px; min-width:560px; }
+  th, td { text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--line); }
+  tr:last-child td { border-bottom:none; }
+  th { color:var(--faint); font-weight:600; background:var(--surface); }
+  footer { margin-top:48px; padding-top:18px; border-top:1px solid var(--line); color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="../assets/icon-192.png" alt="Dragodoku icon">
+    <div>
+      <h1>Privacy Policy</h1>
+      <p>Dragodoku · by PyroDadDev · Effective 11 October 2026</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <strong>In short:</strong> Dragodoku has no accounts and never asks for your name, email or contacts.
+    Your progress and dragons are saved on your phone. To show daily rankings and give each dragon a worldwide serial
+    number, the game uses an anonymous player ID and sends a few game facts to our Google Firebase database.
+    The free version shows ads from Google AdMob, which collects some device data. In the UK, EEA and Switzerland you
+    are asked for consent first, and you can change your choice at any time in Settings.
+  </div>
+
+  <h2>Who we are</h2>
+  <p>Dragodoku (“the game”) is made by PyroDadDev (“we”, “us”), published on Google Play as Dragon Developments,
+  an independent developer based in Wales, United Kingdom. We are the controller of the game data described below.
+  For anything about this policy or your data, email
+  <a href="mailto:pyrodaddev@googlegroups.com">pyrodaddev@googlegroups.com</a>.</p>
+
+  <h2>Information kept on your device</h2>
+  <p>The game stores the following <strong>only on your device</strong>. It is not sent to us:</p>
+  <ul>
+    <li>your puzzle progress: daily results and times, streaks, Ember Shields, unfinished boards, practice progress and embers;</li>
+    <li>your eggs and dragons, including any names you give them, and which one is your Companion;</li>
+    <li>your settings: dragon fire, timer, sound, haptics and the reminder time;</li>
+    <li>a random install code used to roll your eggs, gift codes you’ve redeemed, how many hints you’ve used today,
+    and counters that keep ads to the limits we promise;</li>
+    <li>whether you have bought “Remove Ads”.</li>
+  </ul>
+  <p>Uninstalling the game deletes all of it.</p>
+
+  <h2>Rankings and the dragon registry (Google Firebase)</h2>
+  <p>When your phone is online, the game signs in to our Firebase project with <strong>Firebase Anonymous
+  Authentication</strong>. This creates a random player ID for your copy of the game. It is not linked to your name,
+  email address, phone number or Google account, and we don’t try to identify you. The game then sends only this:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>When</th><th>What is stored</th><th>Why</th></tr>
+      <tr><td>You solve the daily puzzle</td>
+          <td>The puzzle date and your solve time, kept with your anonymous player ID, plus an anonymous count of
+          solve times and flawless solves for that day.</td>
+          <td>To show “faster than X% of players”, count each player once, and tell you your finishing order.</td></tr>
+      <tr><td>A dragon hatches, or later ascends</td>
+          <td>Its species, stage, whether it is Gilded, its serial number, what kind of egg it came from, the date it
+          hatched and your anonymous player ID. Running totals per species are updated.</td>
+          <td>To give every dragon a unique worldwide serial number and show how many of each species exist.</td></tr>
+      <tr><td>You redeem a gift code</td>
+          <td>That the code has been used, and by which anonymous player ID, plus the dragon’s registry record.</td>
+          <td>So each code works once.</td></tr>
+    </table>
+  </div>
+  <p>The per-species totals and the daily counts are public inside the game and contain no IDs. Firebase is provided by
+  Google, which processes this data for us as our service provider; it also handles your IP address and basic device
+  information to deliver the service and keep it secure. The database is hosted in Google Cloud’s London region
+  (europe-west2). See <a href="https://firebase.google.com/support/privacy">Privacy and Security in Firebase</a>.</p>
+  <p>We keep these records while the game is available, because serial numbers must stay unique. We can delete yours on
+  request: email us the names and serial numbers shown on your dragon cards and we will remove those records and any
+  others with the same anonymous ID.</p>
+
+  <h2>Advertising (Google AdMob)</h2>
+  <p>The free version shows an occasional full-screen ad between puzzles, and optional ads you can choose to watch for
+  extra hints or to rekindle a streak. Ads are provided by Google AdMob through the Google Mobile Ads SDK. Google acts
+  as an independent controller of the data it collects. To serve ads, limit repeats, measure performance and prevent
+  fraud, the SDK may collect:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Data</th><th>Examples</th></tr>
+      <tr><td>Device identifiers</td><td>Android advertising ID; on iPhone, the ID for vendors (Dragodoku does not ask for iPhone tracking permission)</td></tr>
+      <tr><td>Approximate location</td><td>derived from your IP address</td></tr>
+      <tr><td>Ad interactions</td><td>which ads were shown, watched or tapped</td></tr>
+      <tr><td>Diagnostics</td><td>device type, operating system, crash and performance data</td></tr>
+    </table>
+  </div>
+  <p>Learn how Google uses this data at
+  <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites or apps that use our services</a>,
+  and in <a href="https://policies.google.com/privacy">Google’s Privacy Policy</a>.</p>
+
+  <h2>Your ad choices</h2>
+  <ul>
+    <li><strong>UK, EEA and Switzerland:</strong> on first launch you see Google’s consent message, with the choice to
+    consent, not consent, or manage options. Personalised ads are only shown if you agree. You can change your choice at
+    any time in <em>Settings → Ad privacy choices</em>.</li>
+    <li><strong>Android:</strong> you can reset or delete your advertising ID in your device settings
+    (<em>Settings → Privacy → Ads</em>, or <em>Google → Ads</em> on some devices).</li>
+    <li><strong>Fewer ads:</strong> the one-off “Remove Ads” purchase switches off the between-puzzle ads for good.
+    Optional ads stay available only if you choose to watch them.</li>
+  </ul>
+
+  <h2>In-app purchases</h2>
+  <p>“Remove Ads” is sold through Google Play or the Apple App Store, which handle payment. We never receive your payment
+  details, only confirmation that the purchase was made, so the game can switch ads off and restore the purchase on a
+  new device.</p>
+
+  <h2>Reminders</h2>
+  <p>If you turn on the daily reminder, your phone schedules it locally and shows it at the time you choose. No
+  notification data is sent to us, and we don’t use push notifications. The game asks for notification permission only
+  when you turn the reminder on.</p>
+
+  <h2>Sharing</h2>
+  <p>If you tap <em>Share</em>, your device’s share sheet opens with a short message (your result or your dragon) and
+  sometimes a picture of your dragon card. Nothing is sent unless you choose where to send it.</p>
+
+  <h2>Legal bases (UK GDPR and EU GDPR)</h2>
+  <p>Rankings, the dragon registry and gift codes are part of the game you asked to play, and rely on our legitimate
+  interests in running fair rankings and unique serial numbers with as little data as possible. Where consent is
+  required, personalised advertising relies on your consent, which you can withdraw at any time as described above.
+  Non-personalised ads, frequency limits, fraud prevention and measurement rely on legitimate interests: keeping the
+  game free and secure.</p>
+
+  <h2>Children</h2>
+  <p>Dragodoku is a general-audience game and is not directed at children under 13. We do not knowingly collect personal
+  information from children. If you believe a child has provided personal information, contact us and we will help.</p>
+
+  <h2>Your rights</h2>
+  <p>Depending on where you live, you may have the right to access, correct, delete, restrict or object to the
+  processing of your personal data, and to withdraw consent. Because the game is anonymous, we can only find your records
+  from the dragon names and serial numbers you send us. Ad data is handled by Google via the links above. You can also
+  complain to your data protection authority. In the UK that is the Information Commissioner’s Office
+  (<a href="https://ico.org.uk">ico.org.uk</a>).</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, we will update this page and the effective date above. Significant changes will also be
+  noted in the game’s store listing.</p>
+
+  <footer>
+    <p><a href="../">Dragodoku help</a> · <a href="/">PyroDadDev</a> · <a href="mailto:pyrodaddev@googlegroups.com">pyrodaddev@googlegroups.com</a></p>
+  </footer>
+</main>
+</body>
+</html>

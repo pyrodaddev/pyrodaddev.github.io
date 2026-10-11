@@ -13,6 +13,7 @@
   main { max-width:760px; margin:0 auto; padding:56px 20px 64px; }
   h1 { font-size:36px; margin:0 0 6px; letter-spacing:-.5px; }
   .muted { color:var(--muted); margin:0 0 32px; }
+  a.game + a.game { margin-top:12px; }
   a.game { display:flex; gap:16px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; color:var(--text); text-decoration:none; }
   a.game:hover { border-color:var(--accent); }
   a.game img { width:72px; height:72px; border-radius:18px; }
@@ -26,6 +27,10 @@
 <main>
   <h1>PyroDadDev</h1>
   <p class="muted">Small indie games. Made in Wales.</p>
+  <a class="game" href="/dragodoku/">
+    <img src="/dragodoku/assets/icon-192.png" alt="">
+    <div><strong>Dragodoku</strong><span>Solve the daily puzzle. Hatch a dragon.</span></div>
+  </a>
   <a class="game" href="/reacten/">
     <img src="/reacten-icon-192.png" alt="">
     <div><strong>Reacten Arena</strong><span>10 targets. One clock. Fastest wins.</span></div>

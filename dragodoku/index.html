@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dragodoku · Daily Dragon Puzzle</title>
+<meta name="description" content="Dragodoku: one logic puzzle a day. Place one dragon in every row, column and lair, then hatch a dragon. Help, rules and contact.">
+<meta property="og:title" content="Dragodoku · Daily Dragon Puzzle">
+<meta property="og:description" content="Solve the daily puzzle. Hatch a dragon.">
+<meta property="og:image" content="https://pyrodaddev.github.io/dragodoku/assets/feature.jpg">
+<link rel="icon" href="/dragodoku/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("assets/Fredoka-600.woff2") format("woff2"); }
+  @font-face { font-family:"Fredoka"; font-weight:700; font-display:swap; src:url("assets/Fredoka-700.woff2") format("woff2"); }
+  :root {
+    --night:#15102A; --deep:#0E0A1E; --surface:#211A3B; --card:#2A2149; --line:#3E3470;
+    --text:#FFF6EA; --soft:#BDB3DD; --faint:#8C82B0; --ember:#FF8A3D; --gold:#FFC857; --sky:#8EC5FF; --moss:#7BD389;
+    --common:#B9C3D6; --uncommon:#7BD389; --rare:#5FB4FF; --epic:#C07BFF; --legendary:#FFC23D;
+  }
+  * { box-sizing:border-box; }
+  html { background:var(--deep); }
+  body { margin:0; color:var(--soft); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,#231A45 0,var(--night) 520px,var(--deep) 100%); min-height:100vh; }
+  main { max-width:780px; margin:0 auto; padding:36px 16px 64px; }
+  h1, h2, h3, .display { font-family:"Fredoka",system-ui,sans-serif; color:var(--text); letter-spacing:-.2px; }
+  h1 { font-size:44px; line-height:1.05; margin:0; font-weight:700; }
+  h2 { font-size:26px; margin:48px 0 10px; font-weight:600; }
+  h3 { font-size:19px; margin:22px 0 6px; font-weight:600; }
+  p { margin:0 0 12px; }
+  a { color:var(--gold); }
+  strong { color:var(--text); }
+  header.hero { display:flex; gap:18px; align-items:center; }
+  header.hero img { width:84px; height:84px; border-radius:22px; box-shadow:0 8px 28px rgba(0,0,0,.35); flex:none; }
+  .tag { font-family:"Fredoka",system-ui,sans-serif; font-weight:600; color:var(--ember); font-size:19px; margin:6px 0 0; }
+  .cta { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 0; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:999px; text-decoration:none;
+         font-family:"Fredoka",system-ui,sans-serif; font-weight:600; font-size:16px; }
+  .btn.primary { background:var(--ember); color:#2B1D3F; }
+  .btn.ghost { border:1.5px solid var(--line); color:var(--text); }
+  .feature { width:100%; height:auto; display:block; border-radius:22px; margin:28px 0 0; border:1px solid var(--line); }
+  .note { font-size:14px; color:var(--faint); margin-top:10px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px 20px; margin:14px 0; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:14px 0; }
+  .grid .card { margin:0; }
+  .card h3 { margin-top:0; }
+  ul { padding-left:20px; margin:0 0 12px; }
+  li { margin:4px 0; }
+  .table-wrap { overflow-x:auto; margin:12px 0; border:1px solid var(--line); border-radius:16px; }
+  table { width:100%; border-collapse:collapse; font-size:15px; min-width:520px; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  th { color:var(--faint); font-weight:600; background:var(--surface); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .r { font-family:"Fredoka",system-ui,sans-serif; font-weight:600; }
+  .r.common { color:var(--common); } .r.uncommon { color:var(--uncommon); } .r.rare { color:var(--rare); }
+  .r.epic { color:var(--epic); } .r.legendary { color:var(--legendary); }
+  .stages { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+  .stage { flex:1 1 120px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+  .stage b { display:block; font-family:"Fredoka",system-ui,sans-serif; color:var(--text); font-weight:600; }
+  .stage span { font-size:14px; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px 16px; margin:10px 0; }
+  summary { cursor:pointer; color:var(--text); font-family:"Fredoka",system-ui,sans-serif; font-weight:600; font-size:17px; }
+  details p { margin:10px 0 2px; }
+  footer { margin-top:56px; padding-top:20px; border-top:1px solid var(--line); color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+  @media (max-width:520px) {
+    h1 { font-size:36px; }
+    header.hero img { width:68px; height:68px; border-radius:18px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <img src="assets/icon-192.png" alt="Dragodoku icon">
+    <div>
+      <h1>Dragodoku</h1>
+      <p class="tag">Solve the daily puzzle. Hatch a dragon.</p>
+    </div>
+  </header>
+  <div class="cta">
+    <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.dragodoku">Get it on Google Play</a>
+    <a class="btn ghost" href="privacy/">Privacy policy</a>
+    <a class="btn ghost" href="mailto:pyrodaddev@googlegroups.com?subject=Dragodoku">Contact</a>
+  </div>
+  <p class="note">Dragodoku is in testing on Google Play. If the store link doesn’t open yet, it will soon.</p>
+  <img class="feature" src="assets/feature.jpg" width="1024" height="500" alt="Dragodoku: a puzzle grid with a little fire dragon, a storm dragon and a golden egg.">
+
+  <h2>How to play</h2>
+  <div class="card">
+    <p>Every board is split into coloured <strong>lairs</strong>. Place one dragon in every
+    <strong>row</strong>, every <strong>column</strong> and every <strong>lair</strong>.
+    Dragons are territorial: <strong>no two may touch</strong>, not even diagonally.</p>
+    <p style="margin:0">Every puzzle has exactly one answer, and you can always reach it by logic alone. No guessing needed.</p>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h3>Controls</h3>
+      <ul>
+        <li><strong>Tap</strong> a square to scorch it (✕), tap again for a dragon, again to clear.</li>
+        <li><strong>Long-press</strong> to place or remove a dragon straight away.</li>
+        <li><strong>Drag</strong> across squares to scorch lots at once.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Dragon fire</h3>
+      <p>With dragon fire on, a placed dragon scorches every square it rules out, so you can see the board narrow down.
+      Turn it off in Settings (or on the toolbar) for a purer challenge.</p>
+    </div>
+    <div class="card">
+      <h3>The Sage</h3>
+      <p>Stuck? The Sage explains the next logical step in plain words and can show you where it applies.
+      You get 3 free hints a day.</p>
+    </div>
+  </div>
+
+  <h3>The daily puzzle</h3>
+  <p>There is one new daily puzzle for everyone, every day, and it resets at midnight on your phone.
+  The board grows through the week: 7×7 on Monday and Tuesday, 8×8 on Wednesday and Thursday, 9×9 on Friday and Saturday,
+  and a 10×10 on Sunday. When you finish, you see how your time compares with everyone else who solved it today.</p>
+  <h3>Practice</h3>
+  <p>Five practice tiers, from Ember (6×6) to Inferno (10×10), with hundreds of puzzles each.
+  Practice puzzles earn <strong>embers</strong>; every 10 embers warm a new egg.</p>
+
+  <h2>Hatching dragons</h2>
+  <p>Solving the daily puzzle earns an egg. Solve it <strong>flawlessly</strong> (without breaking a rule or using a hint) and it’s a
+  <strong>lucky egg</strong>, with better odds of something rare. There are 30 species: five lineages in six elements
+  (Ember, Tide, Moss, Stone, Storm and Frost), plus limited-time event dragons. Any dragon can also hatch
+  <strong>Gilded</strong>, a rare golden version.</p>
+  <p>You can’t buy eggs or dragons. Every one is earned by solving puzzles. These are the exact odds:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Rarity</th><th>Lineage</th><th class="num">Daily egg</th><th class="num">Lucky egg</th><th class="num">Ember egg</th></tr>
+      <tr><td class="r common">Common</td><td>Whelp</td><td class="num">58%</td><td class="num">40%</td><td class="num">64%</td></tr>
+      <tr><td class="r uncommon">Uncommon</td><td>Drake</td><td class="num">26%</td><td class="num">30%</td><td class="num">24%</td></tr>
+      <tr><td class="r rare">Rare</td><td>Wyvern</td><td class="num">11%</td><td class="num">18%</td><td class="num">9%</td></tr>
+      <tr><td class="r epic">Epic</td><td>Serpent</td><td class="num">4%</td><td class="num">9%</td><td class="num">2.6%</td></tr>
+      <tr><td class="r legendary">Legendary</td><td>Sovereign</td><td class="num">1%</td><td class="num">3%</td><td class="num">0.4%</td></tr>
+      <tr><td class="r legendary">Gilded</td><td>any</td><td class="num">2%</td><td class="num">6%</td><td class="num">1%</td></tr>
+    </table>
+  </div>
+  <p>Daily eggs lean towards the element of the day. Streaks earn bonus <strong>streak eggs</strong>:
+  Rare or better every 7 days, Epic or better every 30 days, and a guaranteed Legendary every 100 days (5% Gilded).</p>
+
+  <h3>Serial numbers</h3>
+  <p>When you’re online, every new dragon is registered and gets a <strong>worldwide serial number</strong> for its species,
+  so you know whether you own <em>#7 of 12</em> or <em>#30,551 of 34,000</em>. The Dragodex shows how many of each species
+  exist across all players.</p>
+
+  <h2>Companions and Ascension</h2>
+  <p>Choose any dragon as your <strong>Companion</strong>. Every daily puzzle you solve in a row together builds your bond,
+  and long bonds make your Companion <strong>ascend</strong> to a stronger form:</p>
+  <div class="stages">
+    <div class="stage"><b>Hatchling</b><span>when it hatches</span></div>
+    <div class="stage"><b>Fledgling</b><span>10 days in a row</span></div>
+    <div class="stage"><b>Adult</b><span>100 days</span></div>
+    <div class="stage"><b>Elder</b><span>365 days</span></div>
+    <div class="stage"><b>Ancient</b><span>1,000 days</span></div>
+  </div>
+  <p>A dragon keeps the stages it has reached. Switching Companions starts a fresh bond with the new one.</p>
+  <h3>Streaks, shields and rekindling</h3>
+  <ul>
+    <li>Every 7-day streak earns an <strong>Ember Shield</strong> (you can hold 3). A shield covers a missed day automatically.</li>
+    <li>Missed a day with no shield? Your streak goes cold, but on the day you come back you can
+    <strong>rekindle</strong> it by watching one optional ad.</li>
+  </ul>
+
+  <h2>Events</h2>
+  <p>Special events bring dragons you can only hatch for a short time. <strong>Hallow’s Eve</strong> runs from
+  24 October to 1 November 2026: any solve might drop a Hallowed egg, and solving the daily on 31 October guarantees one.
+  Event dragons are a bonus and don’t count towards the 30 in the Dragodex.</p>
+
+  <h2>Ads, fairly</h2>
+  <ul>
+    <li>No ads during a puzzle, ever, and none in your first five solves.</li>
+    <li>After that, at most one short ad after every three practice puzzles, at least four minutes apart, and no more than six a day.</li>
+    <li>Optional ads (three extra hints, or rekindling a streak) only play if you choose them.</li>
+    <li>A one-off <strong>Remove Ads</strong> purchase switches the between-puzzle ads off for good and makes Sage hints unlimited.</li>
+  </ul>
+
+  <h2>Questions</h2>
+  <details>
+    <summary>How do I redeem a gift code?</summary>
+    <p>Open <em>Settings → Redeem a gift code</em> and type the code. Codes from PyroDadDev contain a specific dragon,
+    sometimes a special one. Each code works once, and you need to be online to redeem it.</p>
+  </details>
+  <details>
+    <summary>Does it work offline?</summary>
+    <p>Yes. Everything you play is saved on your phone. Rankings, serial numbers and worldwide counts catch up the next time you’re online.</p>
+  </details>
+  <details>
+    <summary>I’ve changed phones. Can I bring my dragons?</summary>
+    <p>Not yet, sorry. There are no accounts, so your Lair lives on the phone you play on. If you bought Remove Ads,
+    use <em>Settings → Restore purchase</em> on your new phone to get it back.</p>
+  </details>
+  <details>
+    <summary>Is the daily puzzle the same for everyone?</summary>
+    <p>Yes. Everyone gets the same board on the same date, which is what makes the rankings fair.</p>
+  </details>
+  <details>
+    <summary>Something’s wrong, or I have an idea</summary>
+    <p>Email <a href="mailto:pyrodaddev@googlegroups.com?subject=Dragodoku">pyrodaddev@googlegroups.com</a>.
+    If it’s about a dragon, include its name and serial number from the card.</p>
+  </details>
+
+  <footer>
+    <p>Dragodoku is made in Wales by <a href="/">PyroDadDev</a> and published on Google Play as Dragon Developments.
+    · <a href="privacy/">Privacy policy</a> · <a href="mailto:pyrodaddev@googlegroups.com">pyrodaddev@googlegroups.com</a></p>
+    <p>Fredoka font © The Fredoka Project Authors, <a href="assets/OFL-Fredoka.txt">SIL Open Font License</a>.</p>
+  </footer>
+</main>
+</body>
+</html>
