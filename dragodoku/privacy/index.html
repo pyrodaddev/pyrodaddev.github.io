@@ -103,7 +103,8 @@
           <td>So names that break the rules can be hidden, with each player’s report counted once.</td></tr>
       <tr><td>A dragon hatches, or later ascends</td>
           <td>Its species, stage, whether it is Gilded, its serial number, what kind of egg it came from, the date and time
-          it was registered and your anonymous player ID. Running totals per species are updated.</td>
+          it was registered, whether it reached Fledgling early with the optional ad boost, and your anonymous player ID.
+          Running totals per species are updated.</td>
           <td>To give every dragon a unique worldwide serial number, show how many of each species exist, and work out the
           collectors leaderboard.</td></tr>
       <tr><td>You redeem a gift code</td>
@@ -129,13 +130,17 @@
   leaderboard data described above from our Firebase database: start and finish times, Tamer names, reports, and which species
   each anonymous player has registered. It works out the leaderboards and writes the top 100 of each back to Firebase, where the
   game reads them. The published leaderboards contain only Tamer names with their numbers and a score (a time, a number of days
-  or a number of species), never player IDs. Players without a Tamer name are counted but never shown.</p>
+  or a number of species), never player IDs. Players without a Tamer name never appear on them. Boards for past days are
+  deleted once the day is over.</p>
   <p>To do this, the program keeps a working copy on that server, kept with anonymous player IDs: the last week of daily
   times, Tamer names, the days each player solved the daily, which species each player has registered and which of their
-  dragons are Gilded, and reports from the last 60 days. Contabo provides the server to us as our hosting provider.</p>
+  dragons are Gilded, and reports from the last 60 days. If you ask us to delete your data, it keeps only your anonymous
+  player ID on a do-not-read list, so nothing of yours is read back in. Contabo provides the server to us as our hosting
+  provider.</p>
   <p>Names that break the rules (rude or hateful words, or someone’s real name or contact details) are hidden from the
-  leaderboards. A name that three different players report is hidden automatically, and we can hide names ourselves. The
-  player can then choose a new name.</p>
+  leaderboards. A name reported by three established players (who have played several timed dailies) is hidden
+  automatically, and we can hide names ourselves. The player can then choose a new name. You can ask us to remove your
+  Tamer name at any time.</p>
 
   <h2 id="delete-data">Deleting your data</h2>
   <div class="card">
@@ -149,13 +154,15 @@
     anonymous player ID, then delete every dragon registry record, daily-ranking and leaderboard entry, Tamer name and report
     linked to that ID, the working copy on our leaderboard server, and the anonymous sign-in record itself, within 30 days,
     and confirm by email.</p>
-    <p style="margin:0"><strong>What is kept:</strong> the per-species totals and daily solver counts, which contain no IDs,
-    and the serial numbers themselves, which are never reissued. Ad data is held by Google; use the ad choices below.</p>
+    <p style="margin:0"><strong>What is kept:</strong> the daily solver counts, which contain no IDs; the per-species totals
+    (a total can hold the registry ID of the latest dragon of that species until the next one hatches, and we clear it if
+    it is yours); the record that a gift code you redeemed has been used (we remove your ID from it); and the serial
+    numbers themselves, which are never reissued. Ad data is held by Google; use the ad choices below.</p>
   </div>
 
   <h2>Advertising (Google AdMob)</h2>
   <p>The free version shows an occasional full-screen ad between puzzles, and optional ads you can choose to watch for
-  extra hints or to rekindle a streak. Ads are provided by Google AdMob through the Google Mobile Ads SDK. Google acts
+  extra hints, to rekindle a streak, or to help a Hatchling grow into a Fledgling early. Ads are provided by Google AdMob through the Google Mobile Ads SDK. Google acts
   as an independent controller of the data it collects. To serve ads, limit repeats, measure performance and prevent
   fraud, the SDK may collect:</p>
   <div class="table-wrap">

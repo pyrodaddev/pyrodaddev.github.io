@@ -163,8 +163,8 @@
       </div>
     </div>
     <p class="muted" style="margin:0 0 10px">The app already blocks rude words, so this is for anything that slips through. Players
-    can report a name by tapping it on a leaderboard, and a name that three different players report is hidden automatically.
-    Hiding a name takes it off every leaderboard within a few minutes. The player sees that it was hidden, and once they choose a
+    can report a name by tapping it on a leaderboard, and a name that three established players (three or more timed dailies)
+    report is hidden automatically. Hiding a name takes it off the leaderboards within about 15 minutes; unhiding it sticks. The player sees that it was hidden, and once they choose a
     new name (allowed about once a day) they reappear.</p>
     <div class="msg" id="namesMsg"></div>
     <div class="table-wrap"><table id="namesTable"></table></div>
@@ -370,7 +370,8 @@ async function mintDragon(sp, st, g, note) {
     if (codeSnap.exists()) throw new Error('code clash, try again');
     const p = popSnap.exists() ? popSnap.data() : {};
     const n = (p.n || 0) + 1;
-    const upd = { n, k: `mint:${code.id}` };
+    // `k` is public (pop is world-readable), so it must never hold the code.
+    const upd = { n, k: 'minted' };
     if (g) upd.g = (p.g || 0) + 1;
     for (let s = 2; s <= st; s++) upd[`s${s}`] = (p[`s${s}`] || 0) + 1;
     tx.set(popRef, upd, { merge: true });
@@ -530,15 +531,16 @@ $('nReports').onclick = async () => {
     snap.forEach(d => {
       const r = d.data();
       const key = `${r.n}#${r.t}`;
-      const e = byHandle.get(key) || { n: r.n, t: r.t, count: 0, last: null };
-      e.count += 1;
+      const e = byHandle.get(key) || { n: r.n, t: r.t, by: new Set(), count: 0, last: null };
+      e.by.add(r.by);
+      e.count = e.by.size;
       const at = r.at ? r.at.toDate() : null;
       if (at && (!e.last || at > e.last)) e.last = at;
       byHandle.set(key, e);
     });
     const rows = [...byHandle.values()].sort((a, b) => b.count - a.count || (b.last || 0) - (a.last || 0));
     msg.textContent = rows.length ? `${rows.length} reported name${rows.length === 1 ? '' : 's'} (from the latest ${snap.size} reports).` : 'No reports.';
-    let html = '<tr><th>Tamer</th><th class="n">Reports</th><th>Latest</th><th></th></tr>';
+    let html = '<tr><th>Tamer</th><th class="n">Players reporting</th><th>Latest</th><th></th></tr>';
     for (const e of rows) {
       html += `<tr><td>${esc(e.n)}<span class="tag">#${esc(e.t)}</span></td><td class="n">${e.count}</td>` +
         `<td class="muted">${e.last ? e.last.toLocaleString('en-GB') : ''}</td>` +
