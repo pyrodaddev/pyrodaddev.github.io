@@ -88,7 +88,7 @@
     </div>
     <div class="table-wrap"><table id="popTable"></table></div>
     <p class="muted" style="margin:10px 0 0">Hatched is the highest serial issued. Stage columns count dragons that reached that stage
-    (Fledgling 10 days, Adult 100, Elder 365, Ancient 1,000). <em>Ad boost</em> counts Fledglings reached early by watching three
+    (Fledgling 7 days, Adult 30, Elder 180, Ancient 365, Eternal 720). <em>Ad boost</em> counts Fledglings reached early by watching three
     adverts; they're included in the Fledgling column.</p>
   </section>
 
@@ -126,7 +126,7 @@
         <label class="for-dragon">Species<select id="mSpecies"></select></label>
         <label class="for-dragon">Stage<select id="mStage">
           <option value="1">I · Hatchling</option><option value="2">II · Fledgling</option><option value="3">III · Adult</option>
-          <option value="4">IV · Elder</option><option value="5">V · Ancient</option></select></label>
+          <option value="4">IV · Elder</option><option value="5">V · Ancient</option><option value="6">VI · Eternal</option></select></label>
         <label class="check for-dragon"><input type="checkbox" id="mGilded"> Gilded</label>
         <label>How many<input type="number" id="mCount" value="1" min="1" max="25" style="width:80px"></label>
       </div>
@@ -227,7 +227,7 @@ const $ = (id) => document.getElementById(id);
 const fmt = (n) => (n ?? 0).toLocaleString('en-GB');
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-const STAGES = ['Hatchling','Fledgling','Adult','Elder','Ancient'];
+const STAGES = ['Hatchling','Fledgling','Adult','Elder','Ancient','Eternal'];
 
 // Serials come in runs of 9,999 per species: #AAA-0001 … #AAA-9999, then
 // #AAB-0001 … up to ZZZ (same as the app). Stored as plain counts.
@@ -274,7 +274,7 @@ async function loadPops() {
 }
 
 // Columns after Hatched: [field, heading]. b2 = Fledglings reached with the 3-advert boost.
-const POP_COLS = [['g','Gilded'], ['s2','Fledgling'], ['b2','Ad boost'], ['s3','Adult'], ['s4','Elder'], ['s5','Ancient']];
+const POP_COLS = [['g','Gilded'], ['s2','Fledgling'], ['b2','Ad boost'], ['s3','Adult'], ['s4','Elder'], ['s5','Ancient'], ['s6','Eternal']];
 
 function renderPops() {
   const showEvent = $('showEvent').checked;
