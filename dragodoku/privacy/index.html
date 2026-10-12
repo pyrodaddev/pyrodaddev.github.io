@@ -42,16 +42,17 @@
     <img src="../assets/icon-192.png" alt="Dragodoku icon">
     <div>
       <h1>Privacy Policy</h1>
-      <p>Dragodoku · by PyroDadDev · Effective 11 October 2026</p>
+      <p>Dragodoku · by PyroDadDev · Effective 12 October 2026</p>
     </div>
   </header>
 
   <div class="card">
     <strong>In short:</strong> Dragodoku has no accounts and never asks for your name, email or contacts.
-    Your progress and dragons are saved on your phone. To show daily rankings and give each dragon a worldwide serial
-    number, the game uses an anonymous player ID and sends a few game facts to our Google Firebase database.
-    The free version shows ads from Google AdMob, which collects some device data. In the UK, EEA and Switzerland you
-    are asked for consent first, and you can change your choice at any time in Settings.
+    Your progress and dragons are saved on your phone. To show daily rankings and leaderboards and give each dragon a
+    worldwide serial number, the game uses an anonymous player ID and sends a few game facts to our Google Firebase database.
+    If you choose a Tamer name, it is shown on the public leaderboards with a four-digit number. The free version shows ads
+    from Google AdMob, which collects some device data. In the UK, EEA and Switzerland you are asked for consent first, and
+    you can change your choice at any time in Settings.
   </div>
 
   <h2>Who we are</h2>
@@ -65,6 +66,7 @@
   <ul>
     <li>your puzzle progress: daily results and times, streaks, Ember Shields, unfinished boards, practice progress and embers;</li>
     <li>your eggs and dragons, including any names you give them, and which one is your Companion;</li>
+    <li>your Tamer name and its number, if you choose one;</li>
     <li>your settings: dragon fire, timer, sound, haptics and the reminder time;</li>
     <li>a random install code used to roll your eggs, gift codes you’ve redeemed, how many hints you’ve used today,
     and counters that keep ads to the limits we promise;</li>
@@ -76,21 +78,34 @@
   also include the game’s saved data in your Google backup, so it can come back when you reinstall or set up a new phone.
   That backup is kept by Google in your Google account, and you can manage or delete it in your phone’s backup settings.</p>
 
-  <h2>Rankings and the dragon registry (Google Firebase)</h2>
+  <h2>Rankings, leaderboards and the dragon registry (Google Firebase)</h2>
   <p>When your phone is online, the game signs in to our Firebase project with <strong>Firebase Anonymous
   Authentication</strong>. This creates a random player ID for your copy of the game. It is not linked to your name,
   email address, phone number or Google account, and we don’t try to identify you. The game then sends only this:</p>
   <div class="table-wrap">
     <table>
       <tr><th>When</th><th>What is stored</th><th>Why</th></tr>
+      <tr><td>You tap Start on the daily puzzle</td>
+          <td>Our server’s time when you tapped Start, kept with your anonymous player ID.</td>
+          <td>So leaderboard times are measured by our server’s clock, not your phone’s.</td></tr>
       <tr><td>You solve the daily puzzle</td>
           <td>The puzzle date and your solve time, kept with your anonymous player ID, plus an anonymous count of
-          solve times and flawless solves for that day.</td>
-          <td>To show “faster than X% of players”, count each player once, and tell you your finishing order.</td></tr>
+          solve times and flawless solves for that day. If you tapped Start while online, also our server’s time when you
+          finished, whether the solve was flawless and how many hints you used.</td>
+          <td>To show “faster than X% of players”, count each player once, tell you your finishing order, and work out the
+          leaderboards.</td></tr>
+      <tr><td>You choose a Tamer name (optional)</td>
+          <td>The name, its four-digit number and when you set it, kept with your anonymous player ID. The name and number
+          are shown on the public leaderboards; your player ID never is.</td>
+          <td>To show you on the leaderboards.</td></tr>
+      <tr><td>You report a name on a leaderboard</td>
+          <td>The name and number you reported, when, and your anonymous player ID.</td>
+          <td>So names that break the rules can be hidden, with each player’s report counted once.</td></tr>
       <tr><td>A dragon hatches, or later ascends</td>
-          <td>Its species, stage, whether it is Gilded, its serial number, what kind of egg it came from, the date it
-          hatched and your anonymous player ID. Running totals per species are updated.</td>
-          <td>To give every dragon a unique worldwide serial number and show how many of each species exist.</td></tr>
+          <td>Its species, stage, whether it is Gilded, its serial number, what kind of egg it came from, the date and time
+          it was registered and your anonymous player ID. Running totals per species are updated.</td>
+          <td>To give every dragon a unique worldwide serial number, show how many of each species exist, and work out the
+          collectors leaderboard.</td></tr>
       <tr><td>You redeem a gift code</td>
           <td>That the code has been used, and by which anonymous player ID, plus the dragon’s registry record.</td>
           <td>So each code works once.</td></tr>
@@ -109,6 +124,19 @@
   <p>We keep these records while the game is available, because serial numbers must stay unique. You can ask us to delete
   yours at any time (see below).</p>
 
+  <h2>Leaderboards (our server)</h2>
+  <p>Every few minutes, a small program on a server we rent from Contabo GmbH, hosted in the European Union, reads the
+  leaderboard data described above from our Firebase database: start and finish times, Tamer names, reports, and which species
+  each anonymous player has registered. It works out the leaderboards and writes the top 100 of each back to Firebase, where the
+  game reads them. The published leaderboards contain only Tamer names with their numbers and a score (a time, a number of days
+  or a number of species), never player IDs. Players without a Tamer name are counted but never shown.</p>
+  <p>To do this, the program keeps a working copy on that server, kept with anonymous player IDs: the last week of daily
+  times, Tamer names, the days each player solved the daily, which species each player has registered and which of their
+  dragons are Gilded, and reports from the last 60 days. Contabo provides the server to us as our hosting provider.</p>
+  <p>Names that break the rules (rude or hateful words, or someone’s real name or contact details) are hidden from the
+  leaderboards. A name that three different players report is hidden automatically, and we can hide names ourselves. The
+  player can then choose a new name.</p>
+
   <h2 id="delete-data">Deleting your data</h2>
   <div class="card">
     <p><strong>Data on your phone:</strong> uninstall Dragodoku. This deletes your progress, dragons, settings and the
@@ -117,9 +145,10 @@
     <p><strong>Data in our Firebase database:</strong> email
     <a href="mailto:pyrodaddev@googlegroups.com?subject=Dragodoku%20data%20deletion">pyrodaddev@googlegroups.com</a>
     with the subject “Dragodoku data deletion” and include the name and serial number shown on at least one of your dragon
-    cards (for example “Cinderpip #0042”). We use it to find your anonymous player ID, then delete every dragon registry
-    record and daily-ranking entry linked to that ID, and the anonymous sign-in record itself, within 30 days, and confirm
-    by email.</p>
+    cards (for example “Cinderpip #0042”), or your Tamer name and number (for example “Ember#4821”). We use it to find your
+    anonymous player ID, then delete every dragon registry record, daily-ranking and leaderboard entry, Tamer name and report
+    linked to that ID, the working copy on our leaderboard server, and the anonymous sign-in record itself, within 30 days,
+    and confirm by email.</p>
     <p style="margin:0"><strong>What is kept:</strong> the per-species totals and daily solver counts, which contain no IDs,
     and the serial numbers themselves, which are never reissued. Ad data is held by Google; use the ad choices below.</p>
   </div>
@@ -170,11 +199,13 @@
   <h2>International transfers</h2>
   <p>Google may process the data described here outside the UK, including in the United States. For Firebase, Google is
   our processor under its data processing terms, which include the safeguards UK and EU law require for these transfers.
-  For ads, Google is an independent controller and describes its own safeguards in its privacy policy.</p>
+  For ads, Google is an independent controller and describes its own safeguards in its privacy policy. Our leaderboard
+  server is in the European Union, which UK law recognises as giving adequate protection.</p>
 
   <h2>Legal bases (UK GDPR and EU GDPR)</h2>
-  <p>Rankings, the dragon registry and gift codes are part of the game you asked to play, and rely on our legitimate
-  interests in running fair rankings and unique serial numbers with as little data as possible.</p>
+  <p>Rankings, leaderboards, the dragon registry and gift codes are part of the game you asked to play, and rely on our
+  legitimate interests in running fair rankings and leaderboards and unique serial numbers with as little data as possible.
+  Appearing on the leaderboards is your choice: you only appear if you choose a Tamer name.</p>
   <p>In the UK, EEA and Switzerland, ads only store or read information on your device for advertising, and only use your
   data for personalised ads, if you consent. You can withdraw consent at any time as described above. Without consent,
   Google can show limited ads, which aren’t personalised and don’t use your device’s storage or advertising ID to choose
@@ -184,13 +215,14 @@
   <h2>Children</h2>
   <p>Dragodoku is a general-audience game and is not directed at children under 13. We do not knowingly collect personal
   information from children. The game works the same way for every player: no accounts, only anonymous IDs, and in the
-  UK, EEA and Switzerland, personalised ads only with consent. If you believe a child has provided personal information,
-  contact us and we will help.</p>
+  UK, EEA and Switzerland, personalised ads only with consent. Tamer names are optional, and the game asks players not to use
+  real names or contact details in them. If you believe a child has provided personal information, contact us and we will
+  help.</p>
 
   <h2>Your rights</h2>
   <p>Depending on where you live, you may have the right to access, correct, delete, restrict or object to the
   processing of your personal data, and to withdraw consent. Because the game is anonymous, we can only find your records
-  from the dragon names and serial numbers you send us. Ad data is handled by Google via the links above. You can also
+  from the dragon names and serial numbers, or the Tamer name and number, you send us. Ad data is handled by Google via the links above. You can also
   complain to your data protection authority. In the UK that is the Information Commissioner’s Office
   (<a href="https://ico.org.uk">ico.org.uk</a>).</p>
 

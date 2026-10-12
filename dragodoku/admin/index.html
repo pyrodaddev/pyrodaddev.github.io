@@ -60,7 +60,9 @@
   .code tt { font-size:16px; color:var(--gold); letter-spacing:.5px; }
   .msg { margin-top:10px; font-size:14px; }
   .msg.err { color:var(--danger); }
-  .admin-only[hidden] { display:none; }
+  [hidden] { display:none !important; }
+  .pill.warn { background:rgba(255,200,87,.16); color:var(--gold); }
+  .tag { color:var(--faint); font-size:12px; }
   footer { margin-top:32px; color:var(--faint); font-size:13px; }
 </style>
 </head>
@@ -69,7 +71,7 @@
   <header>
     <div class="brand">
       <img src="../assets/icon-192.png" alt="">
-      <div><h1>Dragodoku Registry</h1><div class="muted">Populations, daily solvers and gift codes</div></div>
+      <div><h1>Dragodoku Registry</h1><div class="muted">Populations, daily solvers, leaderboards and gift codes</div></div>
     </div>
     <div class="who" id="who"><span class="muted">Loading…</span></div>
   </header>
@@ -86,7 +88,22 @@
     </div>
     <div class="table-wrap"><table id="popTable"></table></div>
     <p class="muted" style="margin:10px 0 0">Hatched is the highest serial issued. Stage columns count dragons that reached that stage
-    (Fledgling 10 days, Adult 100, Elder 365, Ancient 1,000).</p>
+    (Fledgling 10 days, Adult 100, Elder 365, Ancient 1,000). <em>Ad boost</em> counts Fledglings reached early by watching three
+    adverts; they're included in the Fledgling column.</p>
+  </section>
+
+  <section class="card" id="boardsCard">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>Leaderboards</h2>
+      <div class="row" style="align-items:center">
+        <span id="workerPill" class="pill">worker: checking…</span>
+        <select id="boardPick">
+          <option value="today">Today's fastest</option><option value="streaks">Streaks</option><option value="collectors">Collectors</option>
+        </select>
+      </div>
+    </div>
+    <p class="muted" id="workerText" style="margin:0 0 10px"></p>
+    <div class="table-wrap"><table id="boardTable"></table></div>
   </section>
 
   <div class="grid2">
@@ -97,16 +114,21 @@
 
     <section class="card admin-only" id="mintCard" hidden>
       <h2>Mint gift codes</h2>
-      <p class="muted" style="margin:0 0 12px">Each code holds one specific dragon with its own serial number. Players redeem
-      it in <em>Settings → Redeem a gift code</em>. A code works once.</p>
+      <p class="muted" style="margin:0 0 12px">Players redeem codes in <em>Settings → Redeem a gift code</em>, and each code works
+      once. A <b>dragon</b> code holds one exact dragon with its serial number reserved now. An <b>egg</b> code gives an egg that
+      hatches in the app like any other, so its dragon gets the next serial when it hatches.</p>
       <div class="row">
-        <label>Species<select id="mSpecies"></select></label>
-        <label>Stage<select id="mStage">
+        <label>Gift<select id="mKind">
+          <option value="dragon">A dragon</option><option value="egg">An egg</option></select></label>
+        <label class="for-egg" hidden>Egg<select id="mEgg"></select></label>
+        <label class="for-dragon">Species<select id="mSpecies"></select></label>
+        <label class="for-dragon">Stage<select id="mStage">
           <option value="1">I · Hatchling</option><option value="2">II · Fledgling</option><option value="3">III · Adult</option>
           <option value="4">IV · Elder</option><option value="5">V · Ancient</option></select></label>
-        <label class="check"><input type="checkbox" id="mGilded"> Gilded</label>
+        <label class="check for-dragon"><input type="checkbox" id="mGilded"> Gilded</label>
         <label>How many<input type="number" id="mCount" value="1" min="1" max="25" style="width:80px"></label>
       </div>
+      <p class="muted for-egg" id="mEggAbout" style="margin:8px 0 0" hidden></p>
       <div class="row" style="margin-top:10px">
         <label style="flex:1">Note (who it's for)<input type="text" id="mNote" maxlength="80" placeholder="e.g. Halloween giveaway"></label>
         <button id="mint">Mint</button>
@@ -129,6 +151,25 @@
     <div class="table-wrap"><table id="codesTable"></table></div>
   </section>
 
+  <section class="card admin-only" id="namesCard" hidden>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>Tamer names</h2>
+      <div class="row" style="align-items:center">
+        <input type="text" id="nFind" maxlength="24" placeholder="Name or Name#1234" style="width:190px">
+        <button class="ghost" id="nSearch">Find</button>
+        <button class="ghost" id="nRecent">Newest</button>
+        <button class="ghost" id="nReports">Reported</button>
+        <button class="ghost" id="nHidden">Hidden</button>
+      </div>
+    </div>
+    <p class="muted" style="margin:0 0 10px">The app already blocks rude words, so this is for anything that slips through. Players
+    can report a name by tapping it on a leaderboard, and a name that three different players report is hidden automatically.
+    Hiding a name takes it off every leaderboard within a few minutes. The player sees that it was hidden, and once they choose a
+    new name (allowed about once a day) they reappear.</p>
+    <div class="msg" id="namesMsg"></div>
+    <div class="table-wrap"><table id="namesTable"></table></div>
+  </section>
+
   <section class="card admin-only" id="lookupCard" hidden>
     <h2>Find a dragon</h2>
     <p class="muted" style="margin:0 0 12px">For support and privacy requests: players can send the species and serial number from
@@ -142,14 +183,15 @@
     <div class="table-wrap"><table id="lookupTable"></table></div>
   </section>
 
-  <footer>Data from Cloud Firestore (project dragodoku-b4cec). Populations and daily counts are public; everything else needs
-  an account listed in <code>admins/</code>.</footer>
+  <footer>Data from Cloud Firestore (project dragodoku-b4cec). Populations, daily counts and leaderboards are public; everything
+  else needs an account listed in <code>admins/</code>. The leaderboard worker runs on the PyroDadDev server and is allowed in by a
+  document in <code>workers/</code>.</footer>
 </main>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc }
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc, updateDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const app = initializeApp({
@@ -203,36 +245,42 @@ async function loadPops() {
   renderPops();
 }
 
+// Columns after Hatched: [field, heading]. b2 = Fledglings reached with the 3-advert boost.
+const POP_COLS = [['g','Gilded'], ['s2','Fledgling'], ['b2','Ad boost'], ['s3','Adult'], ['s4','Elder'], ['s5','Ancient']];
+
 function renderPops() {
   const showEvent = $('showEvent').checked;
   const rows = SPECIES.filter(s => showEvent || !s.event);
-  const tot = { n:0, g:0, s2:0, s3:0, s4:0, s5:0 };
-  let html = '<tr><th class="n">#</th><th>Species</th><th>Rarity</th><th>Element</th><th class="n">Hatched</th><th class="n">Gilded</th>' +
-    STAGES.slice(1).map(s => `<th class="n">${s}</th>`).join('') + '</tr>';
+  const tot = { n:0 };
+  for (const [k] of POP_COLS) tot[k] = 0;
+  const cell = (v) => `<td class="n">${v ? fmt(v) : '<span class="muted">0</span>'}</td>`;
+  let html = '<tr><th class="n">#</th><th>Species</th><th>Rarity</th><th>Element</th><th class="n">Hatched</th>' +
+    POP_COLS.map(([, h]) => `<th class="n">${h}</th>`).join('') + '</tr>';
   for (const s of rows) {
     const p = pops[s.id] || {};
     for (const k of Object.keys(tot)) tot[k] += p[k] || 0;
     html += `<tr><td class="n muted">${String(s.dex).padStart(3,'0')}</td><td>${esc(s.name)}${s.event ? ' <span class="pill">event</span>' : ''}</td>` +
-      `<td class="r-${s.rarity}">${cap(s.rarity)}</td><td>${cap(s.element)}</td>` +
-      `<td class="n">${fmt(p.n)}</td><td class="n">${fmt(p.g)}</td>` +
-      ['s2','s3','s4','s5'].map(k => `<td class="n">${p[k] ? fmt(p[k]) : '<span class="muted">0</span>'}</td>`).join('') + '</tr>';
+      `<td class="r-${s.rarity}">${cap(s.rarity)}</td><td>${cap(s.element)}</td><td class="n">${fmt(p.n)}</td>` +
+      POP_COLS.map(([k]) => cell(p[k])).join('') + '</tr>';
   }
-  html += `<tr class="total"><td></td><td>Total</td><td></td><td></td><td class="n">${fmt(tot.n)}</td><td class="n">${fmt(tot.g)}</td>` +
-    ['s2','s3','s4','s5'].map(k => `<td class="n">${fmt(tot[k])}</td>`).join('') + '</tr>';
+  html += `<tr class="total"><td></td><td>Total</td><td></td><td></td><td class="n">${fmt(tot.n)}</td>` +
+    POP_COLS.map(([k]) => `<td class="n">${fmt(tot[k])}</td>`).join('') + '</tr>';
   $('popTable').innerHTML = html;
   const found = SPECIES.filter(s => !s.event && (pops[s.id]?.n || 0) > 0).length;
-  kpi.hatched = tot.n; kpi.gilded = tot.g; kpi.found = found;
+  kpi.hatched = tot.n; kpi.gilded = tot.g; kpi.found = found; kpi.boosted = tot.b2;
   renderKpis();
 }
 
-const kpi = { hatched:0, gilded:0, found:0, today:0, todayFlawless:0 };
+const kpi = { hatched:0, gilded:0, found:0, boosted:0, today:0, todayFlawless:0 };
 function renderKpis() {
+  const standard = SPECIES.filter(s => !s.event).length;
   $('kpis').innerHTML = [
     [fmt(kpi.today), 'solved today'],
     [fmt(kpi.todayFlawless), 'flawless today'],
     [fmt(kpi.hatched), 'dragons hatched'],
     [fmt(kpi.gilded), 'gilded'],
-    [`${kpi.found}/30`, 'species seen'],
+    [`${kpi.found}/${standard}`, 'species seen'],
+    [fmt(kpi.boosted), 'ad boosts'],
   ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
 }
 
@@ -288,14 +336,62 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-function newCode(sp) {
-  const prefix = (byId[sp].element || 'drago').toUpperCase();
+function newCode(prefix) {
   const bytes = crypto.getRandomValues(new Uint8Array(8));
   const body = Array.from(bytes, b => ALPHABET[b % ALPHABET.length]).join('');
   return { id: prefix + body, pretty: `${prefix}-${body.slice(0,4)}-${body.slice(4)}` };
 }
+const prettyCode = (id) => id.replace(/^([A-Z]+)([A-Z0-9]{4})([A-Z0-9]{4})$/, '$1-$2-$3');
+
+// Egg codes the app understands (EggKind names in lib/dragons/dragon.dart).
+const EGGS = {
+  golden: { label:'Golden egg', prefix:'GOLD', about:'Always hatches a Gilded dragon, with normal daily-egg odds for its species.' },
+  rare: { label:'Rare egg', prefix:'RARE', about:'Hatches Rare or better: 75% Rare, 20% Epic, 5% Legendary, 5% chance of Gilded.' },
+  lucky: { label:'Lucky egg', prefix:'LUCKY', about:'Better odds than a daily egg: 40/30/18/9/3% from Common to Legendary, 6% Gilded.' },
+  daily: { label:'Daily egg', prefix:'EGG', about:'The same odds as the daily puzzle egg.' },
+};
+$('mEgg').innerHTML = Object.entries(EGGS).map(([k, e]) => `<option value="${k}">${e.label}</option>`).join('');
+function syncMintForm() {
+  const egg = $('mKind').value === 'egg';
+  document.querySelectorAll('.for-egg').forEach(el => { el.hidden = !egg; });
+  document.querySelectorAll('.for-dragon').forEach(el => { el.hidden = egg; });
+  $('mEggAbout').textContent = EGGS[$('mEgg').value].about;
+}
+$('mKind').onchange = syncMintForm;
+$('mEgg').onchange = syncMintForm;
+syncMintForm();
+
+async function mintDragon(sp, st, g, note) {
+  const code = newCode((byId[sp].element || 'drago').toUpperCase());
+  const serial = await runTransaction(db, async (tx) => {
+    const popRef = doc(db, 'pop', sp);
+    const codeRef = doc(db, 'codes', code.id);
+    const [popSnap, codeSnap] = [await tx.get(popRef), await tx.get(codeRef)];
+    if (codeSnap.exists()) throw new Error('code clash, try again');
+    const p = popSnap.exists() ? popSnap.data() : {};
+    const n = (p.n || 0) + 1;
+    const upd = { n, k: `mint:${code.id}` };
+    if (g) upd.g = (p.g || 0) + 1;
+    for (let s = 2; s <= st; s++) upd[`s${s}`] = (p[`s${s}`] || 0) + 1;
+    tx.set(popRef, upd, { merge: true });
+    tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
+    return n;
+  });
+  return { ...code, line: `${g ? 'Gilded ' : ''}${esc(byId[sp].name)} · ${STAGES[st - 1]} · #${String(serial).padStart(4,'0')}` };
+}
+
+async function mintEgg(egg, note) {
+  const code = newCode(EGGS[egg].prefix);
+  await runTransaction(db, async (tx) => {
+    const codeRef = doc(db, 'codes', code.id);
+    if ((await tx.get(codeRef)).exists()) throw new Error('code clash, try again');
+    tx.set(codeRef, { kind: 'egg', egg, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
+  });
+  return { ...code, line: EGGS[egg].label };
+}
 
 $('mint').onclick = async () => {
+  const egg = $('mKind').value === 'egg' ? $('mEgg').value : null;
   const sp = $('mSpecies').value;
   const st = Number($('mStage').value);
   const g = $('mGilded').checked;
@@ -306,44 +402,28 @@ $('mint').onclick = async () => {
   $('mint').disabled = true;
   const made = [];
   try {
-    for (let i = 0; i < count; i++) {
-      const code = newCode(sp);
-      const serial = await runTransaction(db, async (tx) => {
-        const popRef = doc(db, 'pop', sp);
-        const codeRef = doc(db, 'codes', code.id);
-        const [popSnap, codeSnap] = [await tx.get(popRef), await tx.get(codeRef)];
-        if (codeSnap.exists()) throw new Error('code clash, try again');
-        const p = popSnap.exists() ? popSnap.data() : {};
-        const n = (p.n || 0) + 1;
-        const upd = { n, k: `mint:${code.id}` };
-        if (g) upd.g = (p.g || 0) + 1;
-        for (let s = 2; s <= st; s++) upd[`s${s}`] = (p[`s${s}`] || 0) + 1;
-        tx.set(popRef, upd, { merge: true });
-        tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
-        return n;
-      });
-      made.push({ ...code, serial });
-    }
+    for (let i = 0; i < count; i++) made.push(egg ? await mintEgg(egg, note) : await mintDragon(sp, st, g, note));
     msg.textContent = `Minted ${made.length} code${made.length === 1 ? '' : 's'}.`;
   } catch (e) {
     msg.className = 'msg err'; msg.textContent = `Minting failed: ${e.message}`;
   }
   $('mint').disabled = false;
-  const s = byId[sp];
-  $('minted').innerHTML = made.map(c => `<div class="code"><div><tt>${c.pretty}</tt><div class="muted">${g ? 'Gilded ' : ''}${esc(s.name)} · ${STAGES[st - 1]} · #${String(c.serial).padStart(4,'0')}</div></div>` +
+  $('minted').innerHTML = made.map(c => `<div class="code"><div><tt>${c.pretty}</tt><div class="muted">${c.line}</div></div>` +
     `<button class="ghost" data-copy="${c.pretty}">Copy</button></div>`).join('') + $('minted').innerHTML;
   document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = 'Copied'; }));
-  loadPops();
+  if (!egg) loadPops();
 };
 
 $('loadCodes').onclick = async () => {
   const snap = await getDocs(query(collection(db, 'codes'), orderBy('created', 'desc'), limit(100)));
-  let html = '<tr><th>Code</th><th>Dragon</th><th class="n">Serial</th><th>Note</th><th>Created</th><th>Status</th></tr>';
+  let html = '<tr><th>Code</th><th>Gift</th><th class="n">Serial</th><th>Note</th><th>Created</th><th>Status</th></tr>';
   snap.forEach(d => {
     const c = d.data();
     const s = byId[c.sp];
-    const pretty = d.id.replace(/^([A-Z]+)([A-Z0-9]{4})([A-Z0-9]{4})$/, '$1-$2-$3');
-    html += `<tr><td><tt>${esc(pretty)}</tt></td><td>${c.g ? 'Gilded ' : ''}${esc(s ? s.name : c.sp)} · ${STAGES[(c.st || 1) - 1]}</td>` +
+    const what = c.kind === 'egg'
+      ? `${esc(EGGS[c.egg]?.label || 'Egg')} <span class="pill">egg</span>`
+      : `${c.g ? 'Gilded ' : ''}${esc(s ? s.name : c.sp)} · ${STAGES[(c.st || 1) - 1]}`;
+    html += `<tr><td><tt>${esc(prettyCode(d.id))}</tt></td><td>${what}</td>` +
       `<td class="n">${c.sn ? '#' + String(c.sn).padStart(4,'0') : '—'}</td><td>${esc(c.note)}</td>` +
       `<td class="muted">${c.created ? c.created.toDate().toLocaleString('en-GB') : ''}</td>` +
       `<td>${c.r ? '<span class="pill ok">redeemed</span>' : '<span class="pill">unused</span>'}</td></tr>`;
@@ -351,6 +431,136 @@ $('loadCodes').onclick = async () => {
   if (snap.empty) html += '<tr><td colspan="6" class="muted">No codes yet.</td></tr>';
   $('codesTable').innerHTML = html;
 };
+
+// ---- Leaderboards: compiled by the worker on the PyroDadDev server (public documents).
+const ago = (d) => {
+  const m = Math.round((Date.now() - d.getTime()) / 60000);
+  return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 2880 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
+};
+const clock = (ms) => {
+  const t = Math.floor(ms / 100);
+  return `${Math.floor(t / 600)}:${String(Math.floor(t / 10) % 60).padStart(2, '0')}.${t % 10}`;
+};
+
+async function loadWorker() {
+  const pill = $('workerPill');
+  try {
+    const snap = await getDoc(doc(db, 'boards', 'status'));
+    if (!snap.exists()) {
+      pill.className = 'pill warn'; pill.textContent = 'worker: not started';
+      $('workerText').textContent = 'The leaderboard worker hasn\'t reported in yet.';
+      return;
+    }
+    const w = snap.data();
+    const when = w.updated ? w.updated.toDate() : null;
+    const stale = !when || Date.now() - when.getTime() > 15 * 60000;
+    pill.className = `pill ${stale ? 'no' : 'ok'}`;
+    pill.textContent = `worker: ${stale ? 'not running' : 'running'}`;
+    $('workerText').textContent = `Last run ${when ? ago(when) : 'unknown'} (run ${fmt(w.runs)}, ${fmt(w.lastRunMs)} ms, version ${w.version || '?'}). ` +
+      `${fmt(w.players)} Tamer name${w.players === 1 ? '' : 's'} chosen so far. Boards refresh every 3 minutes.`;
+  } catch (e) {
+    pill.className = 'pill no'; pill.textContent = 'worker: unknown';
+    $('workerText').textContent = `Couldn't read the worker status: ${e.message}`;
+  }
+}
+
+async function loadBoard() {
+  const pick = $('boardPick').value;
+  const id = pick === 'today' ? `day-${dayIndex(new Date())}` : pick;
+  try {
+    const snap = await getDoc(doc(db, 'boards', id));
+    const b = snap.exists() ? snap.data() : { entries: [], total: 0 };
+    const entries = (b.entries || []).slice(0, 25);
+    const value = (e) => pick === 'today' ? `${clock(e.v)}${e.f ? ' ✦' : ''}` : pick === 'streaks' ? `${fmt(e.v)} days` : `${fmt(e.v)} species${e.x ? ` +${e.x} event` : ''}`;
+    let html = '<tr><th class="n">#</th><th>Tamer</th><th class="n">' + (pick === 'today' ? 'Time' : pick === 'streaks' ? 'Streak' : 'Dragodex') + '</th></tr>';
+    entries.forEach((e, i) => {
+      html += `<tr><td class="n">${i + 1}</td><td>${esc(e.n)}<span class="tag">#${esc(e.t)}</span></td><td class="n">${value(e)}</td></tr>`;
+    });
+    if (!entries.length) html += '<tr><td colspan="3" class="muted">No one on this board yet.</td></tr>';
+    else if ((b.total || 0) > entries.length) html += `<tr><td colspan="3" class="muted">Showing the top ${entries.length} of ${fmt(b.total)}.</td></tr>`;
+    $('boardTable').innerHTML = html;
+  } catch (e) {
+    $('boardTable').innerHTML = `<tr><td class="muted">Couldn't load the board: ${esc(e.message)}</td></tr>`;
+  }
+}
+$('boardPick').onchange = loadBoard;
+
+// ---- Tamer name moderation (admins only; the rules let admins change just `hidden`).
+async function showNames(q, label) {
+  const msg = $('namesMsg');
+  msg.className = 'msg'; msg.textContent = `Loading ${label}…`;
+  try {
+    const snap = await getDocs(q);
+    msg.textContent = snap.empty ? `No names found (${label}).` : `${snap.size} name${snap.size === 1 ? '' : 's'} (${label}).`;
+    let html = '<tr><th>Tamer</th><th>Chosen</th><th>Player (anonymous)</th><th>Status</th><th></th></tr>';
+    snap.forEach(d => {
+      const p = d.data();
+      html += `<tr><td>${esc(p.name)}<span class="tag">#${esc(p.tag)}</span></td>` +
+        `<td class="muted">${p.at ? p.at.toDate().toLocaleString('en-GB') : ''}</td><td class="muted">${esc(d.id)}</td>` +
+        `<td>${p.hidden ? '<span class="pill no">hidden</span>' : '<span class="pill ok">shown</span>'}</td>` +
+        `<td><button class="${p.hidden ? 'ghost' : 'danger'}" data-uid="${esc(d.id)}" data-hide="${p.hidden ? '0' : '1'}">${p.hidden ? 'Unhide' : 'Hide'}</button></td></tr>`;
+    });
+    $('namesTable').innerHTML = snap.empty ? '' : html;
+    document.querySelectorAll('[data-hide]').forEach(b => b.onclick = async () => {
+      const hide = b.dataset.hide === '1';
+      b.disabled = true;
+      try {
+        await updateDoc(doc(db, 'players', b.dataset.uid), { hidden: hide });
+        const cell = b.closest('tr').children[3];
+        cell.innerHTML = hide ? '<span class="pill no">hidden</span>' : '<span class="pill ok">shown</span>';
+        b.dataset.hide = hide ? '0' : '1';
+        b.textContent = hide ? 'Unhide' : 'Hide';
+        b.className = hide ? 'ghost' : 'danger';
+      } catch (e) {
+        msg.className = 'msg err'; msg.textContent = `Couldn't update: ${e.message}`;
+      }
+      b.disabled = false;
+    });
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = `Couldn't load names: ${e.message}`;
+  }
+}
+$('nRecent').onclick = () => showNames(query(collection(db, 'players'), orderBy('at', 'desc'), limit(100)), 'newest 100');
+$('nReports').onclick = async () => {
+  const msg = $('namesMsg');
+  msg.className = 'msg'; msg.textContent = 'Loading reports…';
+  try {
+    const snap = await getDocs(query(collection(db, 'reports'), orderBy('at', 'desc'), limit(300)));
+    const byHandle = new Map();
+    snap.forEach(d => {
+      const r = d.data();
+      const key = `${r.n}#${r.t}`;
+      const e = byHandle.get(key) || { n: r.n, t: r.t, count: 0, last: null };
+      e.count += 1;
+      const at = r.at ? r.at.toDate() : null;
+      if (at && (!e.last || at > e.last)) e.last = at;
+      byHandle.set(key, e);
+    });
+    const rows = [...byHandle.values()].sort((a, b) => b.count - a.count || (b.last || 0) - (a.last || 0));
+    msg.textContent = rows.length ? `${rows.length} reported name${rows.length === 1 ? '' : 's'} (from the latest ${snap.size} reports).` : 'No reports.';
+    let html = '<tr><th>Tamer</th><th class="n">Reports</th><th>Latest</th><th></th></tr>';
+    for (const e of rows) {
+      html += `<tr><td>${esc(e.n)}<span class="tag">#${esc(e.t)}</span></td><td class="n">${e.count}</td>` +
+        `<td class="muted">${e.last ? e.last.toLocaleString('en-GB') : ''}</td>` +
+        `<td><button class="ghost" data-find="${esc(e.n)}#${esc(e.t)}">Review</button></td></tr>`;
+    }
+    $('namesTable').innerHTML = rows.length ? html : '';
+    document.querySelectorAll('[data-find]').forEach(b => b.onclick = () => { $('nFind').value = b.dataset.find; $('nSearch').click(); });
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = `Couldn't load reports: ${e.message}`;
+  }
+};
+$('nHidden').onclick = () => showNames(query(collection(db, 'players'), where('hidden', '==', true), limit(200)), 'hidden');
+$('nSearch').onclick = () => {
+  const raw = $('nFind').value.trim();
+  const m = /^(.+?)#(\d{4})$/.exec(raw);
+  if (!raw) return;
+  const q = m
+    ? query(collection(db, 'players'), where('name', '==', m[1].trim()), where('tag', '==', Number(m[2])))
+    : query(collection(db, 'players'), where('name', '==', raw), limit(100));
+  showNames(q, `“${raw}”`);
+};
+$('nFind').onkeydown = (ev) => { if (ev.key === 'Enter') $('nSearch').click(); };
 
 $('lookup').onclick = async () => {
   const sp = $('lSpecies').value;
@@ -378,12 +588,14 @@ $('lookup').onclick = async () => {
   }
 };
 
-$('refresh').onclick = () => { loadPops(); loadDays(); };
+$('refresh').onclick = () => { loadPops(); loadDays(); loadWorker(); loadBoard(); };
 $('showEvent').onchange = renderPops;
 getRedirectResult(auth).catch(e => alert(`Sign-in failed: ${e.message}`));
 renderKpis();
 loadPops().catch(e => { $('popTable').innerHTML = `<tr><td class="muted">Couldn't load populations: ${esc(e.message)}</td></tr>`; });
 loadDays().catch(() => {});
+loadWorker();
+loadBoard();
 </script>
 </body>
 </html>
