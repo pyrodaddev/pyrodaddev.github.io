@@ -175,10 +175,11 @@
   <section class="card admin-only" id="lookupCard" hidden>
     <h2>Find a dragon</h2>
     <p class="muted" style="margin:0 0 12px">For support and privacy requests: players can send the species and serial number from
-    their card. Deleting registry records never reuses a serial number.</p>
+    their card (for example #AAA-0412: runs of 9,999 per species, AAA first). Deleting registry records never reuses a serial
+    number.</p>
     <div class="row">
       <label>Species<select id="lSpecies"></select></label>
-      <label>Serial<input type="number" id="lSerial" min="1" style="width:110px"></label>
+      <label>Serial<input type="text" id="lSerial" placeholder="AAA-0412" style="width:120px"></label>
       <button id="lookup">Find</button>
     </div>
     <div class="msg" id="lookupMsg"></div>
@@ -227,6 +228,31 @@ const fmt = (n) => (n ?? 0).toLocaleString('en-GB');
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 const STAGES = ['Hatchling','Fledgling','Adult','Elder','Ancient'];
+
+// Serials come in runs of 9,999 per species: #AAA-0001 … #AAA-9999, then
+// #AAB-0001 … up to ZZZ (same as the app). Stored as plain counts.
+const RUN = 9999;
+const serialRun = (n) => {
+  const r = Math.floor((n - 1) / RUN);
+  if (!(n >= 1) || r >= 17576) return null;
+  return String.fromCharCode(65 + Math.floor(r / 676), 65 + Math.floor(r / 26) % 26, 65 + r % 26);
+};
+const serialLabel = (n) => {
+  const run = serialRun(n);
+  return run ? `#${run}-${String((n - 1) % RUN + 1).padStart(4, '0')}` : `#${n}`;
+};
+// Reads "#AAA-0412", "aab 17" or a plain number back into a serial.
+const parseSerial = (text) => {
+  const t = String(text).trim().toUpperCase();
+  let m = /^#?(\d+)$/.exec(t);
+  if (m) return Number(m[1]);
+  m = /^#?([A-Z]{3})[\s\-·]*(\d{1,4})$/.exec(t);
+  if (!m) return null;
+  const num = Number(m[2]);
+  if (num < 1 || num > RUN) return null;
+  const [a, b, c] = [...m[1]].map(ch => ch.charCodeAt(0) - 65);
+  return (a * 676 + b * 26 + c) * RUN + num;
+};
 
 // Day index: local calendar days since Monday 12 Oct 2026 (puzzle #1), like the app.
 const EPOCH = Date.UTC(2026, 9, 12);
@@ -387,7 +413,7 @@ async function mintDragon(sp, st, g, note) {
     tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
     return n;
   });
-  return { ...code, line: `${g ? 'Gilded ' : ''}${esc(byId[sp].name)} · ${STAGES[st - 1]} · #${String(serial).padStart(4,'0')}` };
+  return { ...code, line: `${g ? 'Gilded ' : ''}${esc(byId[sp].name)} · ${STAGES[st - 1]} · ${serialLabel(serial)}` };
 }
 
 async function mintEgg(egg, note) {
@@ -434,7 +460,7 @@ $('loadCodes').onclick = async () => {
       ? `${esc(EGGS[c.egg]?.label || 'Egg')} <span class="pill">egg</span>`
       : `${c.g ? 'Gilded ' : ''}${esc(s ? s.name : c.sp)} · ${STAGES[(c.st || 1) - 1]}`;
     html += `<tr><td><tt>${esc(prettyCode(d.id))}</tt></td><td>${what}</td>` +
-      `<td class="n">${c.sn ? '#' + String(c.sn).padStart(4,'0') : '—'}</td><td>${esc(c.note)}</td>` +
+      `<td class="n">${c.sn ? serialLabel(c.sn) : '—'}</td><td>${esc(c.note)}</td>` +
       `<td class="muted">${c.created ? c.created.toDate().toLocaleString('en-GB') : ''}</td>` +
       `<td>${c.r ? '<span class="pill ok">redeemed</span>' : '<span class="pill">unused</span>'}</td></tr>`;
   });
@@ -579,9 +605,10 @@ $('nFind').onkeydown = (ev) => { if (ev.key === 'Enter') $('nSearch').click(); }
 
 $('lookup').onclick = async () => {
   const sp = $('lSpecies').value;
-  const sn = Number($('lSerial').value);
+  const sn = parseSerial($('lSerial').value);
   const msg = $('lookupMsg');
-  msg.className = 'msg'; msg.textContent = 'Searching…';
+  if (sn == null) { msg.className = 'msg err'; msg.textContent = 'Type the serial as on the card, e.g. AAA-0412.'; return; }
+  msg.className = 'msg'; msg.textContent = `Searching for ${serialLabel(sn)} (serial ${fmt(sn)})…`;
   try {
     const snap = await getDocs(query(collection(db, 'dragons'), where('sp', '==', sp), where('sn', '==', sn)));
     msg.textContent = snap.empty ? 'No registry record with that species and serial.' : '';
