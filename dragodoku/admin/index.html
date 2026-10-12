@@ -98,7 +98,9 @@
       <div class="row" style="align-items:center">
         <span id="workerPill" class="pill">worker: checking…</span>
         <select id="boardPick">
-          <option value="today">Today's fastest</option><option value="streaks">Streaks</option><option value="collectors">Collectors</option>
+          <option value="today-5">Today: Inferno</option><option value="today-4">Today: Blaze</option><option value="today-3">Today: Flame</option>
+          <option value="today-2">Today: Spark</option><option value="today-1">Today: Ember</option><option value="today-old">Today: old app</option>
+          <option value="streaks">Streaks</option><option value="collectors">Collectors</option>
         </select>
       </div>
     </div>
@@ -108,7 +110,7 @@
 
   <div class="grid2">
     <section class="card">
-      <h2>Daily solvers</h2>
+      <h2>Daily solves (per puzzle)</h2>
       <div class="table-wrap"><table id="daysTable"></table></div>
     </section>
 
@@ -275,7 +277,7 @@ const kpi = { hatched:0, gilded:0, found:0, boosted:0, today:0, todayFlawless:0 
 function renderKpis() {
   const standard = SPECIES.filter(s => !s.event).length;
   $('kpis').innerHTML = [
-    [fmt(kpi.today), 'solved today'],
+    [fmt(kpi.today), 'daily solves today'],
     [fmt(kpi.todayFlawless), 'flawless today'],
     [fmt(kpi.hatched), 'dragons hatched'],
     [fmt(kpi.gilded), 'gilded'],
@@ -284,19 +286,26 @@ function renderKpis() {
   ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
 }
 
+// Each day has five puzzles (app 1.2.0 on): days/<day>-<tier>, tier 1 Ember
+// 6x6 ... 5 Inferno 10x10. days/<day> holds the single daily of app 1.0-1.1.
+const TIERS = ['Ember', 'Spark', 'Flame', 'Blaze', 'Inferno'];
 async function loadDays() {
   const today = dayIndex(new Date());
   const days = [];
-  for (let i = today; i > today - 14 && i >= 0; i--) days.push(i);
-  const docs = await Promise.all(days.map(d => getDoc(doc(db, 'days', String(d))).catch(() => null)));
-  let html = '<tr><th>Puzzle</th><th>Date</th><th class="n">Solvers</th><th class="n">Flawless</th></tr>';
-  docs.forEach((snap, i) => {
-    const data = snap && snap.exists() ? snap.data() : {};
-    if (i === 0) { kpi.today = data.n || 0; kpi.todayFlawless = data.g || 0; }
-    html += `<tr><td>#${days[i] + 1}</td><td>${dayLabel(days[i])}${i === 0 ? ' <span class="pill ok">today</span>' : ''}</td>` +
-      `<td class="n">${fmt(data.n)}</td><td class="n">${fmt(data.g)}</td></tr>`;
+  for (let i = today; i > today - 10 && i >= 0; i--) days.push(i);
+  const keys = (d) => [String(d), ...TIERS.map((_, k) => `${d}-${k + 1}`)];
+  const docs = await Promise.all(days.flatMap(d => keys(d).map(k => getDoc(doc(db, 'days', k)).catch(() => null))));
+  let html = '<tr><th>Puzzle</th><th>Date</th>' + TIERS.map(t => `<th class="n">${t}</th>`).join('') +
+    '<th class="n">Old app</th><th class="n">Flawless</th></tr>';
+  days.forEach((d, i) => {
+    const row = docs.slice(i * 6, i * 6 + 6).map(snap => (snap && snap.exists() ? snap.data() : {}));
+    const solves = row.reduce((a, r) => a + (r.n || 0), 0), flawless = row.reduce((a, r) => a + (r.g || 0), 0);
+    if (i === 0) { kpi.today = solves; kpi.todayFlawless = flawless; }
+    html += `<tr><td>#${d + 1}</td><td>${dayLabel(d)}${i === 0 ? ' <span class="pill ok">today</span>' : ''}</td>` +
+      row.slice(1).map(r => `<td class="n">${fmt(r.n)}</td>`).join('') +
+      `<td class="n">${fmt(row[0].n)}</td><td class="n">${fmt(flawless)}</td></tr>`;
   });
-  if (!days.length) html += '<tr><td colspan="4" class="muted">Puzzle #1 is on Monday 12 October 2026.</td></tr>';
+  if (!days.length) html += '<tr><td colspan="9" class="muted">Puzzle #1 is on Monday 12 October 2026.</td></tr>';
   $('daysTable').innerHTML = html;
   renderKpis();
 }
@@ -466,11 +475,15 @@ async function loadWorker() {
 }
 
 async function loadBoard() {
-  const pick = $('boardPick').value;
-  const id = pick === 'today' ? `day-${dayIndex(new Date())}` : pick;
+  const choice = $('boardPick').value;
+  const today = choice.startsWith('today');
+  const pick = today ? 'today' : choice;
+  const id = today ? `day-${dayIndex(new Date())}` : pick;
   try {
     const snap = await getDoc(doc(db, 'boards', id));
-    const b = snap.exists() ? snap.data() : { entries: [], total: 0 };
+    const raw = snap.exists() ? snap.data() : {};
+    const tier = choice.split('-')[1];
+    const b = !today || tier === 'old' ? raw : ((raw.tiers || {})[tier] || { entries: [], total: 0 });
     const entries = (b.entries || []).slice(0, 25);
     const value = (e) => pick === 'today' ? `${clock(e.v)}${e.f ? ' ✦' : ''}` : pick === 'streaks' ? `${fmt(e.v)} days` : `${fmt(e.v)} species${e.x ? ` +${e.x} event` : ''}`;
     let html = '<tr><th class="n">#</th><th>Tamer</th><th class="n">' + (pick === 'today' ? 'Time' : pick === 'streaks' ? 'Streak' : 'Dragodex') + '</th></tr>';
