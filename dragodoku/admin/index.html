@@ -710,6 +710,9 @@ async function showNames(q, label) {
       b.disabled = true;
       try {
         await updateDoc(doc(db, 'players', b.dataset.uid), { hidden: hide });
+        // A hidden name must not show in Dragon Duels either: remove the
+        // player's shared duel deck (they share it again under a new name).
+        if (hide) await deleteDoc(doc(db, 'decks', b.dataset.uid)).catch(() => {});
         const cell = b.closest('tr').children[3];
         cell.innerHTML = hide ? '<span class="pill no">hidden</span>' : '<span class="pill ok">shown</span>';
         b.dataset.hide = hide ? '0' : '1';
