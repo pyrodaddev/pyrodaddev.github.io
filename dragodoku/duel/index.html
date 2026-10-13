@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dragon Duel invite · Dragodoku</title>
+<meta name="description" content="You've been challenged to a Dragon Duel in Dragodoku. Tap to open the game and join.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="You've been challenged to a Dragon Duel!">
+<meta property="og:description" content="Tap to open Dragodoku and join the duel. Each of you plays your own dragons, from your own phone.">
+<meta property="og:image" content="https://pyrodaddev.github.io/dragodoku/assets/feature.jpg">
+<link rel="icon" href="/dragodoku/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("../assets/Fredoka-600.woff2") format("woff2"); }
+  @font-face { font-family:"Fredoka"; font-weight:700; font-display:swap; src:url("../assets/Fredoka-700.woff2") format("woff2"); }
+  :root {
+    --night:#15102A; --deep:#0E0A1E; --surface:#211A3B; --card:#2A2149; --line:#3E3470;
+    --text:#FFF6EA; --soft:#BDB3DD; --faint:#8C82B0; --ember:#FF8A3D; --gold:#FFC857;
+  }
+  * { box-sizing:border-box; }
+  html { background:var(--deep); }
+  body { margin:0; color:var(--soft); font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,#231A45 0,var(--night) 420px,var(--deep) 100%); min-height:100vh; }
+  main { max-width:520px; margin:0 auto; padding:40px 16px 56px; text-align:center; }
+  h1, h2, .display { font-family:"Fredoka",system-ui,sans-serif; color:var(--text); }
+  h1 { font-size:32px; line-height:1.15; margin:18px 0 10px; font-weight:700; }
+  h2 { font-size:21px; margin:40px 0 8px; font-weight:600; }
+  p { margin:0 0 12px; }
+  a { color:var(--gold); }
+  strong { color:var(--text); }
+  .icon { width:96px; height:96px; border-radius:24px; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 26px; border-radius:999px;
+         text-decoration:none; font-family:"Fredoka",system-ui,sans-serif; font-weight:600; font-size:18px; margin:8px 0; }
+  .btn.primary { background:var(--ember); color:#2B1D3F; min-width:240px; }
+  .btn.ghost { border:1.5px solid var(--line); color:var(--text); font-size:16px; padding:11px 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:16px 18px; margin:18px 0; }
+  .label { display:block; font-size:13px; letter-spacing:1.5px; color:var(--faint); font-weight:700; }
+  .code { display:block; font-family:"Fredoka",system-ui,sans-serif; font-weight:700; font-size:40px; letter-spacing:8px;
+          color:var(--gold); margin:4px 0 6px; }
+  .note { font-size:14px; color:var(--faint); }
+  footer { margin-top:44px; padding-top:16px; border-top:1px solid var(--line); color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="../assets/icon-192.png" alt="Dragodoku icon" width="96" height="96">
+  <h1>You’ve been challenged to a Dragon Duel!</h1>
+  <p>Your friend has opened a room in Dragodoku. Join within 30 minutes and duel them live, each playing your own dragons
+  from your own phone.</p>
+
+  <div id="invite" hidden>
+    <a class="btn primary" id="open" href="#">Open in Dragodoku</a>
+    <div class="card">
+      <span class="label">ROOM CODE</span>
+      <span class="code" id="code"></span>
+      <p class="note">If the game doesn’t open, open Dragon Duels in Dragodoku, tap <strong>Join with a code</strong> and type
+      this in.</p>
+    </div>
+  </div>
+  <p id="bad" hidden>This invite looks incomplete. Ask your friend to send it again.</p>
+  <p id="ios" class="note" hidden>Dragodoku is on Android phones for now.</p>
+
+  <h2>New to Dragodoku?</h2>
+  <p>It’s a free daily puzzle game: five logic puzzles a day, a dragon to hatch from every day you play, and duels with the
+  dragons you raise.</p>
+  <a class="btn ghost" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.dragodoku">Get it on Google Play</a>
+  <p class="note">Dragodoku is in testing on Google Play. If the store link doesn’t open yet, it will soon.</p>
+
+  <footer><a href="/dragodoku/">About Dragodoku</a> · <a href="/dragodoku/privacy/">Privacy policy</a></footer>
+</main>
+<script>
+  // The room code comes from the link (?c=K7MPQ2). It is only shown here and handed to the app; nothing is sent anywhere.
+  (function () {
+    var alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    var code = (new URLSearchParams(location.search).get('c') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    var ok = code.length === 6 && code.split('').every(function (ch) { return alphabet.indexOf(ch) >= 0; });
+    if (!ok) { document.getElementById('bad').hidden = false; return; }
+    document.getElementById('code').textContent = code;
+    document.getElementById('invite').hidden = false;
+    var play = 'https://play.google.com/store/apps/details?id=com.pyrodaddev.dragodoku';
+    var open = document.getElementById('open');
+    if (/Android/i.test(navigator.userAgent)) {
+      // Opens the app if it's installed, otherwise Google Play.
+      open.href = 'intent://duel?c=' + code + '#Intent;scheme=dragodoku;package=com.pyrodaddev.dragodoku;' +
+          'S.browser_fallback_url=' + encodeURIComponent(play) + ';end';
+    } else {
+      open.hidden = true;
+      document.getElementById('ios').hidden = false;
+    }
+  })();
+</script>
+</body>
+</html>
