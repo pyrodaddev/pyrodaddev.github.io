@@ -172,6 +172,18 @@
     <div class="table-wrap"><table id="namesTable"></table></div>
   </section>
 
+  <section class="card admin-only" id="errorsCard" hidden>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>App error reports</h2>
+      <button class="ghost" id="loadErrors">Load</button>
+    </div>
+    <p class="muted" style="margin:0 0 10px">Uncaught errors sent by the app (1.5.0 on): version, Android version, the error and the top
+    of the stack, grouped by where in the code they happened. No personal data; at most five a day per player; the server deletes
+    them after 30 days. Crashes that close the app, and freezes, are in Play Console → Monitor and improve → Android vitals.</p>
+    <div class="msg" id="errorsMsg"></div>
+    <div class="table-wrap"><table id="errorsTable"></table></div>
+  </section>
+
   <section class="card admin-only" id="lookupCard" hidden>
     <h2>Find a dragon</h2>
     <p class="muted" style="margin:0 0 12px">For support and privacy requests: players can send the species and serial number from
@@ -208,10 +220,10 @@ const db = getFirestore(app);
 const RARITY = { whelp:'common', drake:'uncommon', wyvern:'rare', serpent:'epic', sovereign:'legendary' };
 const ELEMENTS = ['ember','tide','moss','stone','storm','frost'];
 const NAMES = {
-  whelp:['Cinderpip','Splashpip','Mosspip','Pebblepip','Sparkpip','Frostpip'],
-  drake:['Charhorn','Brinehorn','Bramblehorn','Boulderhorn','Thunderhorn','Rimehorn'],
-  wyvern:['Scorchwing','Wavewing','Leafwing','Cragwing','Galewing','Icewing'],
-  serpent:['Pyrewyrm','Abysswyrm','Thornwyrm','Quartzwyrm','Voltwyrm','Glacierwyrm'],
+  whelp:['Ashoo','Gurglet','Snoozebud','Hoardling','Frizzlet','Chilliput'],
+  drake:['Ventaur','Brinoceros','Hedgehorn','Slumberock','Stompede','Icicorn'],
+  wyvern:['Soarch','Wavern','Canopteryx','Cragoyle','Nimbolt','Wintervern'],
+  serpent:['Lanternaga','Sirenaga','Lindenwyrm','Crystalisk','Voltcoatl','Hibernaga'],
   sovereign:['Ignarax','Maelora','Sylvaros','Terragon','Tempestra','Glacivorn'],
 };
 const SPECIES = [];
@@ -627,6 +639,37 @@ $('lookup').onclick = async () => {
     });
   } catch (e) {
     msg.className = 'msg err'; msg.textContent = `Search failed: ${e.message}`;
+  }
+};
+
+$('loadErrors').onclick = async () => {
+  const msg = $('errorsMsg');
+  msg.className = 'msg'; msg.textContent = 'Loading the latest 300 reports…';
+  try {
+    const snap = await getDocs(query(collection(db, 'errors'), orderBy('at', 'desc'), limit(300)));
+    const groups = new Map();
+    snap.forEach(d => {
+      const r = d.data();
+      const g = groups.get(r.sig) || { n: 0, players: new Set(), versions: new Set(), fatal: false, last: null, r };
+      g.n += 1;
+      g.players.add(d.id.split('_')[0]);
+      g.versions.add(r.v);
+      g.fatal = g.fatal || r.fatal === true;
+      const at = r.at && r.at.toDate ? r.at.toDate() : null;
+      if (at && (!g.last || at > g.last)) g.last = at;
+      groups.set(r.sig, g);
+    });
+    msg.textContent = snap.empty ? 'No error reports. Good news.' : `${fmt(snap.size)} report(s) in ${groups.size} group(s), newest first.`;
+    let html = '<tr><th>Last seen</th><th class="n">Reports</th><th class="n">Players</th><th>Versions</th><th>Error</th></tr>';
+    [...groups.values()].sort((a, b) => (b.last || 0) - (a.last || 0)).forEach(g => {
+      html += `<tr><td>${g.last ? esc(g.last.toLocaleString('en-GB')) : ''}</td><td class="n">${fmt(g.n)}</td>` +
+        `<td class="n">${fmt(g.players.size)}</td><td>${esc([...g.versions].join(', '))}</td>` +
+        `<td><b>${esc(g.r.type)}</b>${g.fatal ? ' <span class="muted">(uncaught)</span>' : ''}<br>${esc(g.r.msg)}` +
+        `<details><summary class="muted">Stack · ${esc(g.r.os || '')}</summary><pre style="white-space:pre-wrap;font-size:12px;margin:6px 0 0">${esc(g.r.st)}</pre></details></td></tr>`;
+    });
+    $('errorsTable').innerHTML = snap.empty ? '' : html;
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = `Couldn't load error reports: ${e.message}`;
   }
 };
 
