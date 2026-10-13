@@ -99,7 +99,7 @@
         <span id="workerPill" class="pill">worker: checking…</span>
         <select id="boardPick">
           <option value="today-5">Today: Inferno</option><option value="today-4">Today: Blaze</option><option value="today-3">Today: Flame</option>
-          <option value="today-2">Today: Spark</option><option value="today-1">Today: Ember</option><option value="today-old">Today: old app</option>
+          <option value="today-2">Today: Spark</option><option value="today-1">Today: Glow</option><option value="today-old">Today: old app</option>
           <option value="streaks">Streaks</option><option value="collectors">Collectors</option>
         </select>
       </div>
@@ -219,6 +219,8 @@ const db = getFirestore(app);
 
 const RARITY = { whelp:'common', drake:'uncommon', wyvern:'rare', serpent:'epic', sovereign:'legendary' };
 const ELEMENTS = ['ember','tide','moss','stone','storm','frost'];
+// The fire element's id is 'ember'; the app shows it as Fire since 1.6.0.
+const elementLabel = (e) => e === 'ember' ? 'Fire' : e.charAt(0).toUpperCase() + e.slice(1);
 const NAMES = {
   whelp:['Ashoo','Gurglet','Snoozebud','Hoardling','Frizzlet','Chilliput'],
   drake:['Ventaur','Brinoceros','Hedgehorn','Slumberock','Stompede','Icicorn'],
@@ -300,7 +302,7 @@ function renderPops() {
     const p = pops[s.id] || {};
     for (const k of Object.keys(tot)) tot[k] += p[k] || 0;
     html += `<tr><td class="n muted">${String(s.dex).padStart(3,'0')}</td><td>${esc(s.name)}${s.event ? ' <span class="pill">event</span>' : ''}</td>` +
-      `<td class="r-${s.rarity}">${cap(s.rarity)}</td><td>${cap(s.element)}</td><td class="n">${fmt(p.n)}</td>` +
+      `<td class="r-${s.rarity}">${cap(s.rarity)}</td><td>${elementLabel(s.element)}</td><td class="n">${fmt(p.n)}</td>` +
       POP_COLS.map(([k]) => cell(p[k])).join('') + '</tr>';
   }
   html += `<tr class="total"><td></td><td>Total</td><td></td><td></td><td class="n">${fmt(tot.n)}</td>` +
@@ -324,9 +326,9 @@ function renderKpis() {
   ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
 }
 
-// Each day has five puzzles (app 1.2.0 on): days/<day>-<tier>, tier 1 Ember
+// Each day has five puzzles (app 1.2.0 on): days/<day>-<tier>, tier 1 Glow ("Ember" until app 1.6.0)
 // 6x6 ... 5 Inferno 10x10. days/<day> holds the single daily of app 1.0-1.1.
-const TIERS = ['Ember', 'Spark', 'Flame', 'Blaze', 'Inferno'];
+const TIERS = ['Glow', 'Spark', 'Flame', 'Blaze', 'Inferno'];
 async function loadDays() {
   const today = dayIndex(new Date());
   const days = [];
@@ -409,7 +411,7 @@ $('mEgg').onchange = syncMintForm;
 syncMintForm();
 
 async function mintDragon(sp, st, g, note) {
-  const code = newCode((byId[sp].element || 'drago').toUpperCase());
+  const code = newCode(elementLabel(byId[sp].element || 'drago').toUpperCase());
   const serial = await runTransaction(db, async (tx) => {
     const popRef = doc(db, 'pop', sp);
     const codeRef = doc(db, 'codes', code.id);
