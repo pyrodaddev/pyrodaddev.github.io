@@ -153,6 +153,40 @@
     <div class="table-wrap"><table id="codesTable"></table></div>
   </section>
 
+  <section class="card admin-only" id="dropCard" hidden>
+    <h2>Air drops and gifts</h2>
+    <p class="muted" style="margin:0 0 12px">Send a gift straight into players' apps (app 1.7.0 on), with no code to type. An
+    <b>air drop</b> goes to players picked at random from those who solved a daily puzzle recently; a <b>gift</b> goes to one
+    player you name. They see it, with your message, the next time they open the app (older versions get it once they update).
+    Each one is a gift code minted for that player only, so it also shows under Recent gift codes.</p>
+    <div class="row">
+      <label>Gift<select id="dKind"><option value="egg">An egg</option><option value="dragon">A dragon</option></select></label>
+      <label class="d-egg">Egg<select id="dEgg"></select></label>
+      <label class="d-dragon" hidden>Species<select id="dSpecies"></select></label>
+      <label class="d-dragon" hidden>Stage<select id="dStage">
+        <option value="1">I · Hatchling</option><option value="2">II · Fledgling</option><option value="3">III · Adult</option>
+        <option value="4">IV · Elder</option><option value="5">V · Ancient</option><option value="6">VI · Eternal</option></select></label>
+      <label class="check d-dragon" hidden><input type="checkbox" id="dGilded"> Gilded</label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label>Send to<select id="dTo">
+        <option value="random">Random recent players</option><option value="all">Every recent player</option>
+        <option value="one">One player</option></select></label>
+      <label class="d-random">How many<input type="number" id="dCount" value="3" min="1" max="50" style="width:80px"></label>
+      <label class="d-pool">Played in the last<select id="dDays">
+        <option value="1">1 day</option><option value="3">3 days</option><option value="7" selected>7 days</option>
+        <option value="30">30 days</option></select></label>
+      <label class="d-one" hidden>Player<input type="text" id="dPlayer" maxlength="60" placeholder="Name#1234 or player ID" style="width:220px"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label style="flex:1">Message (players see it)<input type="text" id="dMsg" maxlength="100" placeholder="e.g. Happy Halloween from PyroDadDev!"></label>
+      <button class="ghost" id="dPick">Pick players</button>
+      <button id="dSend" disabled>Send</button>
+    </div>
+    <div class="msg" id="dropMsg"></div>
+    <div class="table-wrap"><table id="dropTable"></table></div>
+  </section>
+
   <section class="card admin-only" id="namesCard" hidden>
     <div class="row" style="justify-content:space-between;align-items:center">
       <h2>Tamer names</h2>
@@ -206,7 +240,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc, updateDoc }
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, runTransaction, serverTimestamp, deleteDoc, updateDoc, setDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const app = initializeApp({
@@ -276,7 +310,7 @@ const dayLabel = (i) => new Date(EPOCH + i * 86400000).toLocaleDateString('en-GB
 let pops = {};
 let isAdmin = false;
 
-for (const sel of [$('mSpecies'), $('lSpecies')]) {
+for (const sel of [$('mSpecies'), $('lSpecies'), $('dSpecies')]) {
   sel.innerHTML = SPECIES.map(s => `<option value="${s.id}">#${String(s.dex).padStart(3,'0')} ${esc(s.name)} · ${cap(s.rarity)}${s.event ? ' (event)' : ''}</option>`).join('');
 }
 
@@ -410,7 +444,8 @@ $('mKind').onchange = syncMintForm;
 $('mEgg').onchange = syncMintForm;
 syncMintForm();
 
-async function mintDragon(sp, st, g, note) {
+// `extra`: fields for codes minted for one player (air drops and gifts: `to`, `drop`).
+async function mintDragon(sp, st, g, note, extra = {}) {
   const code = newCode(elementLabel(byId[sp].element || 'drago').toUpperCase());
   const serial = await runTransaction(db, async (tx) => {
     const popRef = doc(db, 'pop', sp);
@@ -424,18 +459,18 @@ async function mintDragon(sp, st, g, note) {
     if (g) upd.g = (p.g || 0) + 1;
     for (let s = 2; s <= st; s++) upd[`s${s}`] = (p[`s${s}`] || 0) + 1;
     tx.set(popRef, upd, { merge: true });
-    tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
+    tx.set(codeRef, { sp, st, g, sn: n, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid, ...extra });
     return n;
   });
   return { ...code, line: `${g ? 'Gilded ' : ''}${esc(byId[sp].name)} · ${STAGES[st - 1]} · ${serialLabel(serial)}` };
 }
 
-async function mintEgg(egg, note) {
+async function mintEgg(egg, note, extra = {}) {
   const code = newCode(EGGS[egg].prefix);
   await runTransaction(db, async (tx) => {
     const codeRef = doc(db, 'codes', code.id);
     if ((await tx.get(codeRef)).exists()) throw new Error('code clash, try again');
-    tx.set(codeRef, { kind: 'egg', egg, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid });
+    tx.set(codeRef, { kind: 'egg', egg, r: false, note, created: serverTimestamp(), mintedBy: auth.currentUser.uid, ...extra });
   });
   return { ...code, line: EGGS[egg].label };
 }
@@ -466,7 +501,7 @@ $('mint').onclick = async () => {
 
 $('loadCodes').onclick = async () => {
   const snap = await getDocs(query(collection(db, 'codes'), orderBy('created', 'desc'), limit(100)));
-  let html = '<tr><th>Code</th><th>Gift</th><th class="n">Serial</th><th>Note</th><th>Created</th><th>Status</th></tr>';
+  let html = '<tr><th>Code</th><th>Gift</th><th class="n">Serial</th><th>Note</th><th>For</th><th>Created</th><th>Status</th></tr>';
   snap.forEach(d => {
     const c = d.data();
     const s = byId[c.sp];
@@ -475,11 +510,126 @@ $('loadCodes').onclick = async () => {
       : `${c.g ? 'Gilded ' : ''}${esc(s ? s.name : c.sp)} · ${STAGES[(c.st || 1) - 1]}`;
     html += `<tr><td><tt>${esc(prettyCode(d.id))}</tt></td><td>${what}</td>` +
       `<td class="n">${c.sn ? serialLabel(c.sn) : '—'}</td><td>${esc(c.note)}</td>` +
+      `<td class="muted">${c.to ? `<tt>${esc(c.to.slice(0, 8))}…</tt>${c.drop ? ' <span class="pill">drop</span>' : ''}` : 'anyone'}</td>` +
       `<td class="muted">${c.created ? c.created.toDate().toLocaleString('en-GB') : ''}</td>` +
       `<td>${c.r ? '<span class="pill ok">redeemed</span>' : '<span class="pill">unused</span>'}</td></tr>`;
   });
-  if (snap.empty) html += '<tr><td colspan="6" class="muted">No codes yet.</td></tr>';
+  if (snap.empty) html += '<tr><td colspan="7" class="muted">No codes yet.</td></tr>';
   $('codesTable').innerHTML = html;
+};
+
+// ---- Air drops and gifts (app 1.7.0 on): a code minted for one player, listed in inbox/<player>.
+$('dEgg').innerHTML = Object.entries(EGGS).map(([k, e]) => `<option value="${k}">${e.label}</option>`).join('');
+function syncDropForm() {
+  const egg = $('dKind').value === 'egg', to = $('dTo').value;
+  document.querySelectorAll('.d-egg').forEach(el => { el.hidden = !egg; });
+  document.querySelectorAll('.d-dragon').forEach(el => { el.hidden = egg; });
+  document.querySelectorAll('.d-random').forEach(el => { el.hidden = to !== 'random'; });
+  document.querySelectorAll('.d-pool').forEach(el => { el.hidden = to === 'one'; });
+  document.querySelectorAll('.d-one').forEach(el => { el.hidden = to !== 'one'; });
+  dropTargets = []; $('dSend').disabled = true;
+}
+let dropTargets = [];
+for (const id of ['dKind', 'dTo', 'dEgg', 'dSpecies', 'dStage', 'dGilded', 'dCount', 'dDays', 'dPlayer']) $(id).onchange = syncDropForm;
+syncDropForm();
+
+// Players who finished one of the five dailies in the last `days` days (ids are <uid>_<day>-<tier>).
+async function recentPlayers(days) {
+  const today = dayIndex(new Date());
+  const snap = await getDocs(query(collection(db, 'finishes'), where('d', '>=', today - days + 1)));
+  const uids = new Set();
+  snap.forEach(d => uids.add(d.id.slice(0, d.id.lastIndexOf('_'))));
+  return [...uids];
+}
+// "Name#1234" (their Tamer name) or a player ID.
+async function findPlayer(text) {
+  const t = text.trim();
+  const m = /^(.+?)\s*#\s*(\d{4})$/.exec(t);
+  if (m) {
+    const snap = await getDocs(query(collection(db, 'players'), where('name', '==', m[1]), where('tag', '==', Number(m[2]))));
+    return snap.empty ? null : snap.docs[0].id;
+  }
+  return /^[A-Za-z0-9]{20,40}$/.test(t) ? t : null;
+}
+async function tamerOf(uid) {
+  try {
+    const s = await getDoc(doc(db, 'players', uid));
+    return s.exists() ? `${s.data().name}#${s.data().tag}` : null;
+  } catch (e) { return null; }
+}
+function dropGiftLabel() {
+  if ($('dKind').value === 'egg') return EGGS[$('dEgg').value].label;
+  const sp = byId[$('dSpecies').value];
+  return `${$('dGilded').checked ? 'Gilded ' : ''}${sp.name} · ${STAGES[Number($('dStage').value) - 1]}`;
+}
+function shuffled(a) {
+  const r = [...a];
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+$('dPick').onclick = async () => {
+  const msg = $('dropMsg');
+  msg.className = 'msg'; msg.textContent = 'Finding players…';
+  $('dSend').disabled = true;
+  try {
+    const to = $('dTo').value;
+    let uids;
+    if (to === 'one') {
+      const uid = await findPlayer($('dPlayer').value);
+      if (!uid) throw new Error('No player with that Tamer name (Name#1234) or ID.');
+      uids = [uid];
+    } else {
+      const days = Number($('dDays').value);
+      const pool = await recentPlayers(days);
+      if (!pool.length) throw new Error(`Nobody has solved a daily in the last ${days} day${days === 1 ? '' : 's'}.`);
+      const n = Math.max(1, Math.min(50, Number($('dCount').value) || 1));
+      uids = to === 'all' ? pool : shuffled(pool).slice(0, n);
+    }
+    const names = await Promise.all(uids.map(tamerOf));
+    dropTargets = uids.map((uid, i) => ({ uid, name: names[i] }));
+    $('dropTable').innerHTML = '<tr><th>Player</th><th>ID</th><th>Status</th></tr>' + dropTargets.map(t =>
+      `<tr><td>${t.name ? esc(t.name) : '<span class="muted">no Tamer name</span>'}</td><td><tt>${esc(t.uid.slice(0, 10))}…</tt></td><td class="muted">ready</td></tr>`).join('');
+    msg.textContent = `Ready to send ${dropGiftLabel()} to ${dropTargets.length} player${dropTargets.length === 1 ? '' : 's'}. Press Send.`;
+    $('dSend').disabled = false;
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = e.message;
+  }
+};
+
+$('dSend').onclick = async () => {
+  if (!dropTargets.length) return;
+  const msg = $('dropMsg');
+  const isGift = $('dTo').value === 'one';
+  const text = $('dMsg').value.trim().slice(0, 100);
+  const egg = $('dKind').value === 'egg' ? $('dEgg').value : null;
+  const sp = $('dSpecies').value, st = Number($('dStage').value), g = $('dGilded').checked;
+  const dropId = 'd' + Date.now().toString(36);
+  $('dSend').disabled = true; $('dPick').disabled = true;
+  const rows = $('dropTable').querySelectorAll('tr');
+  let sent = 0;
+  for (let i = 0; i < dropTargets.length; i++) {
+    const t = dropTargets[i];
+    const cell = rows[i + 1]?.lastElementChild;
+    try {
+      const note = `${isGift ? 'Gift' : 'Air drop'} for ${t.name || t.uid.slice(0, 8)}${text ? `: ${text}` : ''}`.slice(0, 80);
+      const extra = { to: t.uid, drop: dropId };
+      const made = egg ? await mintEgg(egg, note, extra) : await mintDragon(sp, st, g, note, extra);
+      await setDoc(doc(db, 'inbox', t.uid),
+        { g: { [made.id]: { m: text, k: isGift ? 'gift' : 'drop', at: serverTimestamp() } } }, { merge: true });
+      sent++;
+      if (cell) cell.innerHTML = `<span class="pill ok">sent</span> <tt>${esc(made.pretty)}</tt>`;
+    } catch (e) {
+      if (cell) cell.innerHTML = `<span class="pill no">failed</span> ${esc(e.message)}`;
+    }
+  }
+  msg.textContent = `Sent ${dropGiftLabel()} to ${sent} of ${dropTargets.length} player${dropTargets.length === 1 ? '' : 's'}.`;
+  dropTargets = [];
+  $('dPick').disabled = false;
+  if (!egg) loadPops();
 };
 
 // ---- Leaderboards: compiled by the worker on the PyroDadDev server (public documents).
