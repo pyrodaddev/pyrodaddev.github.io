@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mosaic Critters</title>
+<meta name="description" content="Mosaic Critters: A daily logic puzzle. Every solve reveals a pixel critter.">
+<meta property="og:title" content="Mosaic Critters">
+<meta property="og:description" content="A daily logic puzzle. Every solve reveals a pixel critter.">
+<meta property="og:image" content="https://pyrodaddev.github.io/mosaiccritters/assets/feature.jpg">
+<link rel="icon" href="/mosaiccritters/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("/dragodoku/assets/Fredoka-600.woff2") format("woff2"); }
+  @font-face { font-family:"Fredoka"; font-weight:700; font-display:swap; src:url("/dragodoku/assets/Fredoka-700.woff2") format("woff2"); }
+  :root { --bg:#0F1226; --bg2:#161B38; --card:#1A1F3A; --line:#2C3360; --text:#FFF7EA; --soft:#BDB3DD;
+          --faint:#8C86B0; --accent:#FF6B57; --link:#FFC857; color-scheme:dark; }
+  * { box-sizing:border-box; }
+  html { background:var(--bg); }
+  body { margin:0; color:var(--soft); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,var(--bg2) 0,var(--bg) 380px); min-height:100vh; }
+  a { color:var(--link); }
+  h1, h2, .tag, .btn { font-family:"Fredoka",system-ui,sans-serif; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin:18px 0; }
+  .card strong, strong { color:var(--text); }
+  footer { margin-top:44px; color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+  main { max-width:640px; margin:0 auto; padding:40px 16px 64px; }
+  .hero { text-align:center; }
+  img.icon { width:112px; height:112px; border-radius:28px; box-shadow:0 10px 32px rgba(0,0,0,.25); }
+  h1 { color:var(--text); font-size:40px; line-height:1.05; margin:18px 0 6px; font-weight:700; }
+  .tag { font-weight:600; color:var(--accent); font-size:19px; margin:0 0 18px; }
+  h2 { color:var(--text); font-size:22px; margin:30px 0 8px; font-weight:600; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:13px 22px; border-radius:999px; text-decoration:none;
+         font-weight:600; font-size:17px; margin:6px 4px; }
+  .btn.primary { background:var(--accent); color:#0F1226; }
+  .btn.ghost { border:1.5px solid var(--line); color:var(--text); }
+  img.feature { width:100%; border-radius:16px; border:1px solid var(--line); margin:22px 0 4px; }
+  ul { padding-left:22px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img class="icon" src="/mosaiccritters/assets/icon-192.png" alt="Mosaic Critters icon">
+    <h1>Mosaic Critters</h1>
+    <p class="tag">A daily logic puzzle. Every solve reveals a pixel critter.</p>
+    <p>
+      <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.mosaiccritters">Get it on Google Play</a>
+      <a class="btn ghost" href="/mosaiccritters/privacy/">Privacy</a>
+    </p>
+  </div>
+  <img class="feature" src="/mosaiccritters/assets/feature.jpg" alt="">
+  <p>Every number counts the filled cells in the little square around it. Work out which cells are filled by logic alone, and a pixel-art critter appears. Three new boards every day, the same for everyone, and every daily critter you reveal joins your album.</p>
+  <h2>What's inside</h2>
+  <ul>
+      <li>Three daily boards: Small 10×10, Medium 13×13 and Large 16×16</li>
+      <li>Pure logic, no guessing: every board has exactly one answer</li>
+      <li>96 critters to collect, from common to legendary, with a rare one every Sunday</li>
+      <li>Unlimited practice boards, a streak to keep, and no account needed</li>
+  </ul>
+  <div class="card">
+    <strong>Early days:</strong> Mosaic Critters is in closed testing on Google Play, so the store page may say it isn't
+    available yet. To join the testers, email <a href="mailto:pyrodaddev@googlegroups.com?subject=Mosaic%20Critters%20testing">pyrodaddev@googlegroups.com</a>
+    with the Google account you use on your phone, then open the <a href="https://play.google.com/apps/testing/com.pyrodaddev.mosaiccritters">opt-in link</a>.
+  </div>
+  <h2>Help and contact</h2>
+  <p>Questions, ideas or a bug to report? Email <a href="mailto:pyrodaddev@googlegroups.com">pyrodaddev@googlegroups.com</a>.
+  Your progress lives on your phone, so uninstalling the game deletes it; the <a href="/mosaiccritters/privacy/">privacy policy</a>
+  explains the ads and your choices.</p>
+  <footer>Android first; iPhone later. Made in Wales by <a href="/">PyroDadDev</a>.</footer>
+</main>
+</body>
+</html>

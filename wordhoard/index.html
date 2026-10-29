@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordhoard</title>
+<meta name="description" content="Wordhoard: A themed word search every day. Find the words, stamp your hoard.">
+<meta property="og:title" content="Wordhoard">
+<meta property="og:description" content="A themed word search every day. Find the words, stamp your hoard.">
+<meta property="og:image" content="https://pyrodaddev.github.io/wordhoard/assets/feature.jpg">
+<link rel="icon" href="/wordhoard/assets/icon-192.png">
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("/dragodoku/assets/Fredoka-600.woff2") format("woff2"); }
+  @font-face { font-family:"Fredoka"; font-weight:700; font-display:swap; src:url("/dragodoku/assets/Fredoka-700.woff2") format("woff2"); }
+  :root { --bg:#F6EEDC; --bg2:#EFE4CC; --card:#FFF8E8; --line:#D9CBAA; --text:#2A2118; --soft:#6B5E4F;
+          --faint:#8F826F; --accent:#1F7A8C; --link:#1F7A8C; color-scheme:light; }
+  * { box-sizing:border-box; }
+  html { background:var(--bg); }
+  body { margin:0; color:var(--soft); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,var(--bg2) 0,var(--bg) 380px); min-height:100vh; }
+  a { color:var(--link); }
+  h1, h2, .tag, .btn { font-family:"Fredoka",system-ui,sans-serif; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin:18px 0; }
+  .card strong, strong { color:var(--text); }
+  footer { margin-top:44px; color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+  main { max-width:640px; margin:0 auto; padding:40px 16px 64px; }
+  .hero { text-align:center; }
+  img.icon { width:112px; height:112px; border-radius:28px; box-shadow:0 10px 32px rgba(0,0,0,.25); }
+  h1 { color:var(--text); font-size:40px; line-height:1.05; margin:18px 0 6px; font-weight:700; }
+  .tag { font-weight:600; color:var(--accent); font-size:19px; margin:0 0 18px; }
+  h2 { color:var(--text); font-size:22px; margin:30px 0 8px; font-weight:600; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:13px 22px; border-radius:999px; text-decoration:none;
+         font-weight:600; font-size:17px; margin:6px 4px; }
+  .btn.primary { background:var(--accent); color:#FFF8E8; }
+  .btn.ghost { border:1.5px solid var(--line); color:var(--text); }
+  img.feature { width:100%; border-radius:16px; border:1px solid var(--line); margin:22px 0 4px; }
+  ul { padding-left:22px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img class="icon" src="/wordhoard/assets/icon-192.png" alt="Wordhoard icon">
+    <h1>Wordhoard</h1>
+    <p class="tag">A themed word search every day. Find the words, stamp your hoard.</p>
+    <p>
+      <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.wordhoard">Get it on Google Play</a>
+      <a class="btn ghost" href="/wordhoard/privacy/">Privacy</a>
+    </p>
+  </div>
+  <img class="feature" src="/wordhoard/assets/feature.jpg" alt="">
+  <p>Every day brings a new theme, from Welsh castles to things in a toolbox. Find its words hidden in the grid, in any of eight directions, by dragging from the first letter to the last. Finish the day&#x27;s board and its stamp goes into your hoard.</p>
+  <h2>What's inside</h2>
+  <ul>
+      <li>Two boards a day on the same theme: Quick 10×10 and Full 13×13</li>
+      <li>Over 400 themes, with treasured ones on Sundays</li>
+      <li>A stamp for every theme you complete, and a streak to keep</li>
+      <li>Practice boards whenever you like, and no account needed</li>
+  </ul>
+  <div class="card">
+    <strong>Early days:</strong> Wordhoard is in closed testing on Google Play, so the store page may say it isn't
+    available yet. To join the testers, email <a href="mailto:pyrodaddev@googlegroups.com?subject=Wordhoard%20testing">pyrodaddev@googlegroups.com</a>
+    with the Google account you use on your phone, then open the <a href="https://play.google.com/apps/testing/com.pyrodaddev.wordhoard">opt-in link</a>.
+  </div>
+  <h2>Help and contact</h2>
+  <p>Questions, ideas or a bug to report? Email <a href="mailto:pyrodaddev@googlegroups.com">pyrodaddev@googlegroups.com</a>.
+  Your progress lives on your phone, so uninstalling the game deletes it; the <a href="/wordhoard/privacy/">privacy policy</a>
+  explains the ads and your choices.</p>
+  <footer>Android first; iPhone later. Made in Wales by <a href="/">PyroDadDev</a>.</footer>
+</main>
+</body>
+</html>
