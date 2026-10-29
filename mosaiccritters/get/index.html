@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get Mosaic Critters</title>
+<meta name="description" content="Mosaic Critters: A daily logic puzzle. Every solve reveals a pixel critter. Get it for Android.">
+<meta property="og:title" content="Get Mosaic Critters">
+<meta property="og:description" content="A daily logic puzzle. Every solve reveals a pixel critter.">
+<meta property="og:image" content="https://pyrodaddev.github.io/mosaiccritters/assets/feature.jpg">
+<link rel="icon" href="/mosaiccritters/assets/icon-192.png">
+<!-- The link the game shares. While Mosaic Critters is in closed testing this page explains how to join;
+     at launch, uncomment the refresh below so it goes straight to the store. -->
+<!-- <meta http-equiv="refresh" content="0; url=https://play.google.com/store/apps/details?id=com.pyrodaddev.mosaiccritters"> -->
+<style>
+  @font-face { font-family:"Fredoka"; font-weight:600; font-display:swap; src:url("/dragodoku/assets/Fredoka-600.woff2") format("woff2"); }
+  @font-face { font-family:"Fredoka"; font-weight:700; font-display:swap; src:url("/dragodoku/assets/Fredoka-700.woff2") format("woff2"); }
+  :root { --bg:#0F1226; --bg2:#161B38; --card:#1A1F3A; --line:#2C3360; --text:#FFF7EA; --soft:#BDB3DD;
+          --faint:#8C86B0; --accent:#FF6B57; --link:#FFC857; color-scheme:dark; }
+  * { box-sizing:border-box; }
+  html { background:var(--bg); }
+  body { margin:0; color:var(--soft); font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:linear-gradient(180deg,var(--bg2) 0,var(--bg) 380px); min-height:100vh; }
+  a { color:var(--link); }
+  h1, h2, .tag, .btn { font-family:"Fredoka",system-ui,sans-serif; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin:18px 0; }
+  .card strong, strong { color:var(--text); }
+  footer { margin-top:44px; color:var(--faint); font-size:14px; }
+  footer a { color:var(--soft); }
+  main { max-width:640px; margin:0 auto; padding:40px 16px 64px; text-align:center; }
+  img.icon { width:112px; height:112px; border-radius:28px; box-shadow:0 10px 32px rgba(0,0,0,.25); }
+  h1 { color:var(--text); font-size:40px; line-height:1.05; margin:18px 0 6px; font-weight:700; }
+  .tag { font-weight:600; color:var(--accent); font-size:19px; margin:0 0 18px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:13px 22px; border-radius:999px; text-decoration:none;
+         font-weight:600; font-size:17px; margin:6px 4px; }
+  .btn.primary { background:var(--accent); color:#0F1226; }
+  .btn.ghost { border:1.5px solid var(--line); color:var(--text); }
+  .card { text-align:left; margin-top:26px; }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="/mosaiccritters/assets/icon-192.png" alt="Mosaic Critters icon">
+  <h1>Mosaic Critters</h1>
+  <p class="tag">A daily logic puzzle. Every solve reveals a pixel critter.</p>
+  <p>Every number counts the filled cells in the little square around it. Work out which cells are filled by logic alone, and a pixel-art critter appears. Three new boards every day, the same for everyone, and every daily critter you reveal joins your album.</p>
+  <p>
+    <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.pyrodaddev.mosaiccritters">Get it on Google Play</a>
+    <a class="btn ghost" href="/mosaiccritters/">How to play</a>
+  </p>
+  <div class="card">
+    <strong>Early days:</strong> Mosaic Critters is in closed testing on Google Play, so the store page may say it isn't
+    available yet. To join the testers, email <a href="mailto:pyrodaddev@googlegroups.com?subject=Mosaic%20Critters%20testing">pyrodaddev@googlegroups.com</a>
+    with the Google account you use on your phone, then open the <a href="https://play.google.com/apps/testing/com.pyrodaddev.mosaiccritters">opt-in link</a>.
+  </div>
+  <footer>Android first; iPhone later. Made in Wales by <a href="/">PyroDadDev</a>.</footer>
+</main>
+</body>
+</html>
